@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}RouteIntel Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    .controls {
+        margin-bottom: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+    select, input, button {
+        padding: 8px 12px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    button {
+        background: #3498db;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #2980b9;
+    }
+    button:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background: #34495e;
+        color: white;
+        font-weight: 600;
+    }
+    tr:hover {
+        background: #f5f5f5;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .status-customer {
+        background: #2ecc71;
+        color: white;
+    }
+    .status-prospect {
+        background: #f39c12;
+        color: white;
+    }
+    .status-new {
+        background: #95a5a6;
+        color: white;
+    }
+    .trip-info {
+        background: #ecf0f1;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>RouteIntel Dashboard</h1>
+
+<div class="controls">
+    <h2>Trip Selection</h2>
+    <select id="tripSelect">
+        <option value="">Select a trip...</option>
+    </select>
+    <input type="number" id="radiusInput" placeholder="Radius (km)" value="20" min="1" max="100">
+    <button id="loadButton" disabled>Load Leads</button>
+</div>
+
+<div id="tripInfo" style="display: none;"></div>
+<div id="resultsContainer"></div>
+
+<script src="/static/app.js"></script>
+{% endblock %}
