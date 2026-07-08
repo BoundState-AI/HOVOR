@@ -1,0 +1,128 @@
+{
+  "content_version": "ancestry-slice-0.1.0",
+  "review_status": "PENDING_NATIVE_REVIEW",
+  "missions": [
+    {
+      "id": "modra_archive_records",
+      "title": "Boss: The Missing Birth Record",
+      "region": "Modra",
+      "character": {
+        "name": "pani Kováčová",
+        "role": "archivist at the Modra district archive",
+        "register": "formal"
+      },
+      "briefing": "You have arrived in Modra. The archive employee cannot find the family record. Greet her, explain that your great-grandfather was born near Modra (in Píla), answer her questions, and find out what to do next.",
+      "skill_nodes": ["greetings_basic", "identity_statements", "past_tense_birth", "archive_requests", "survival_phrases"],
+      "opening_line": {"slovak": "Dobrý deň. Nech sa páči, ako vám môžem pomôcť?", "english": "Good day. How can I help you?"},
+      "objectives": [
+        {
+          "id": "greet_formally",
+          "hidden_goal": "Open with a formal greeting.",
+          "lexemes": ["dobry_den"],
+          "match": {"any_phrases": ["dobrý deň", "dobry den"]},
+          "elicit": {"slovak": "Dobrý deň. Nech sa páči, ako vám môžem pomôcť?", "english": "Good day. How can I help you?"},
+          "ack": {"slovak": "Dobrý deň.", "english": "Good day."},
+          "hints": [
+            {"level": "repeat_slower", "text": "Dobrý... deň."},
+            {"level": "semantic", "text": "How do Slovaks greet formally during the day?"},
+            {"level": "first_word", "text": "Dobrý..."},
+            {"level": "show_text", "text": "Dobrý deň"},
+            {"level": "translate", "text": "Say: 'Dobrý deň' — good day."}
+          ]
+        },
+        {
+          "id": "state_identity",
+          "hidden_goal": "Introduce yourself by name.",
+          "lexemes": ["volam_sa", "som"],
+          "match": {"any_phrases": ["volám sa", "volam sa", "ja som", "som "]},
+          "elicit": {"slovak": "Ako sa voláte, prosím?", "english": "What is your name, please?"},
+          "ack": {"slovak": "Teší ma.", "english": "Pleased to meet you."},
+          "hints": [
+            {"level": "repeat_slower", "text": "Ako... sa... voláte?"},
+            {"level": "semantic", "text": "She's asking for your name. 'I am called...'"},
+            {"level": "first_word", "text": "Volám..."},
+            {"level": "show_text", "text": "Volám sa ..."},
+            {"level": "translate", "text": "Say: 'Volám sa' + your name — my name is..."}
+          ]
+        },
+        {
+          "id": "explain_ancestor",
+          "hidden_goal": "Explain that your great-grandfather was born near Modra (in Píla), using the past-tense structure.",
+          "lexemes": ["prastary_otec", "narodil_sa", "pila", "modra"],
+          "match": {
+            "all_groups": [
+              ["prastarý otec", "prastary otec", "pradedko", "starý otec", "stary otec", "dedko"],
+              ["narodil sa", "sa narodil"],
+              ["píla", "pila", "píle", "pile", "modra", "modre", "pri modre"]
+            ]
+          },
+          "target_structure": "past_tense_birth",
+          "elicit": {"slovak": "A koho hľadáte? Povedzte mi o vašej rodine.", "english": "And who are you looking for? Tell me about your family."},
+          "ack": {"slovak": "Aha, rozumiem. Prastarý otec, narodený pri Modre.", "english": "Ah, I understand. Great-grandfather, born near Modra."},
+          "hints": [
+            {"level": "repeat_slower", "text": "Koho... hľadáte?"},
+            {"level": "semantic", "text": "Say who he was (prastarý otec), what happened (narodil sa), and where (v Píle / pri Modre)."},
+            {"level": "first_word", "text": "Môj prastarý otec..."},
+            {"level": "show_text", "text": "Môj prastarý otec sa narodil v Píle, pri Modre."},
+            {"level": "translate", "text": "Say: 'Môj prastarý otec sa narodil v Píle' — my great-grandfather was born in Píla."}
+          ]
+        },
+        {
+          "id": "understand_question",
+          "hidden_goal": "Understand and answer a follow-up question about the year of birth.",
+          "lexemes": ["rok", "kedy", "neviem"],
+          "match": {"any_phrases": ["neviem"], "year_regex": "\\b(17|18|19)\\d{2}\\b"},
+          "elicit": {"slovak": "Dobre. A v ktorom roku sa narodil?", "english": "Good. And in which year was he born?"},
+          "ack": {"slovak": "Ďakujem, to nám pomôže.", "english": "Thank you, that helps us."},
+          "hints": [
+            {"level": "repeat_slower", "text": "V ktorom... roku... sa narodil?"},
+            {"level": "semantic", "text": "She's asking WHEN — the year of birth. Answer with a year, or say you don't know."},
+            {"level": "first_word", "text": "Narodil sa v roku..."},
+            {"level": "show_text", "text": "Narodil sa v roku 1898. / Neviem."},
+            {"level": "translate", "text": "Say a year ('v roku 1898') or 'Neviem' — I don't know."}
+          ]
+        },
+        {
+          "id": "repair_misunderstanding",
+          "hidden_goal": "The archivist misheard the birthplace. Notice it and correct her.",
+          "lexemes": ["nie", "pila", "modra"],
+          "match": {
+            "all_groups": [
+              ["nie"],
+              ["píla", "pila", "píle", "pile", "modra", "modre", "pri modre"]
+            ]
+          },
+          "elicit": {"slovak": "Moment... takže váš prastarý otec sa narodil v Bratislave, áno?", "english": "One moment... so your great-grandfather was born in Bratislava, yes?"},
+          "ack": {"slovak": "Prepáčte, máte pravdu — Píla, pri Modre. Nie Bratislava.", "english": "Apologies, you're right — Píla, near Modra. Not Bratislava."},
+          "hints": [
+            {"level": "repeat_slower", "text": "Narodil sa... v Bratislave... áno?"},
+            {"level": "semantic", "text": "She got the town wrong. Disagree, then repeat the correct place."},
+            {"level": "first_word", "text": "Nie, ..."},
+            {"level": "show_text", "text": "Nie, narodil sa v Píle, pri Modre."},
+            {"level": "translate", "text": "Say: 'Nie, v Píle' — no, in Píla."}
+          ]
+        },
+        {
+          "id": "get_next_step",
+          "hidden_goal": "Ask where the record is or what she needs, and obtain the next step.",
+          "lexemes": ["kde", "zaznam", "potrebujem", "matrika"],
+          "match": {"any_phrases": ["kde", "čo potrebujete", "co potrebujete", "aké informácie", "ake informacie"]},
+          "elicit": {"slovak": "Ten záznam tu bohužiaľ nemáme.", "english": "Unfortunately we don't have that record here."},
+          "ack": {"slovak": "Staršia matrika pre Pílu je v štátnom archíve v Modre. Choďte tam a pýtajte si rodnú matriku, rok 1898.", "english": "The older registry for Píla is in the state archive in Modra. Go there and ask for the birth registry, year 1898."},
+          "hints": [
+            {"level": "repeat_slower", "text": "Ten záznam... tu nemáme."},
+            {"level": "semantic", "text": "The record isn't here. Ask WHERE it is (kde je...?)."},
+            {"level": "first_word", "text": "Kde..."},
+            {"level": "show_text", "text": "Kde je ten záznam?"},
+            {"level": "translate", "text": "Ask: 'Kde je ten záznam?' — where is the record?"}
+          ]
+        }
+      ],
+      "completion_line": {"slovak": "Veľa šťastia s hľadaním. Dovidenia!", "english": "Good luck with the search. Goodbye!"},
+      "win_conditions": {
+        "required_objectives": ["explain_ancestor", "understand_question", "repair_misunderstanding", "get_next_step"],
+        "optional_objectives": ["greet_formally", "state_identity"]
+      }
+    }
+  ]
+}

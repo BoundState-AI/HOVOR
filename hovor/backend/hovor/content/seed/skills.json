@@ -1,0 +1,20 @@
+{
+  "content_version": "ancestry-slice-0.1.0",
+  "nodes": [
+    {"id": "greetings_basic", "kind": "communicative_function", "title": "Basic greetings", "stage": 0},
+    {"id": "survival_phrases", "kind": "communicative_function", "title": "Survival phrases (repeat, slower, don't understand)", "stage": 0},
+    {"id": "identity_statements", "kind": "communicative_function", "title": "Identity statements", "stage": 0},
+    {"id": "family_vocab", "kind": "lexical_family", "title": "Family vocabulary", "stage": 1},
+    {"id": "origin_location", "kind": "communicative_function", "title": "Origin and location", "stage": 1},
+    {"id": "past_tense_birth", "kind": "morphological_pattern", "title": "Past tense: birth and life statements", "stage": 1},
+    {"id": "archive_requests", "kind": "communicative_function", "title": "Archive and records requests", "stage": 1}
+  ],
+  "edges": [
+    {"from": "greetings_basic", "to": "identity_statements"},
+    {"from": "identity_statements", "to": "origin_location"},
+    {"from": "family_vocab", "to": "past_tense_birth"},
+    {"from": "origin_location", "to": "past_tense_birth"},
+    {"from": "past_tense_birth", "to": "archive_requests"},
+    {"from": "survival_phrases", "to": "archive_requests"}
+  ]
+}
