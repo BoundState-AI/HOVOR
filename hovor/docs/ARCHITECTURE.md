@@ -1,6 +1,8 @@
-# HOVOR! Architecture — Build 1 vertical slice
+# HOVOR! Architecture
 
-Status: implemented (backend), iOS port planned.
+Status: backend through Build 3 implemented and tested; web client playable;
+OpenAI Realtime adapter code-complete (live pending key); Build 0 bakeoff
+harness ready for keys + audio; iOS scaffold written (unbuilt).
 Spec reference: HOVOR! Rev 1, 8 July 2026.
 
 ## Shape
@@ -49,13 +51,17 @@ format crosses above it.
 Implementations:
 
 - `MockVoiceProvider` (done) — deterministic, scriptable failures, drives all tests.
-- `OpenAIRealtimeProvider` (next) — WebRTC/WebSocket session against the
-  OpenAI Realtime API; the iOS client owns the audio leg, the backend owns
-  context injection + tool-call validation.
+- `OpenAIRealtimeProvider` (done, live-unverified) — `voice/openai_realtime.py`:
+  injectable Transport (WebSocket now, WebRTC-swappable), shared
+  `build_tutor_instructions()` (persona + hidden-objective steering +
+  correction policy + no-English rule), fake-transport tests prove turn
+  assembly, tool-call proposals, interrupt, and §32 degradation. Needs
+  OPENAI_API_KEY for live verification.
 - `OpenAILiveProvider` (future) — GPT-Live full-duplex when the API ships.
   Slots in with no changes to curriculum, learner state, missions, or scoring.
-- Azure / Google / ElevenLabs — secondary ASR for the independent
-  transcription path (§8.2) and the Build 0 bakeoff.
+- Azure / Google / ElevenLabs — bakeoff adapters exist as fail-loud skeletons
+  in `bakeoff/providers.py`; the dual-transcript agreement gate on attempts
+  (`transcript_disagreement`) is the §8.2 independent path's landing zone.
 
 ## iOS port plan (SwiftUI)
 
