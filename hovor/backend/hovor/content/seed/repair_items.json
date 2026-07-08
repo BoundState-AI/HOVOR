@@ -1,0 +1,47 @@
+{
+  "content_version": "ancestry-slice-0.2.0",
+  "review_status": "PENDING_NATIVE_REVIEW",
+  "notes": "error_repair exercise items: sentences carrying typical English-L1 transfer errors. The learner produces the corrected sentence.",
+  "items": [
+    {
+      "id": "er_volam_sa_je",
+      "broken": "Volám sa je Ján.",
+      "fixed": ["volám sa ján"],
+      "lexemes": ["volam_sa"],
+      "skill_nodes": ["identity_statements"],
+      "explanation": "„volám sa“ already contains the verb — no extra „je“. English speakers add it because of „my name IS“."
+    },
+    {
+      "id": "er_z_amerika",
+      "broken": "Som z Amerika.",
+      "fixed": ["som z ameriky"],
+      "lexemes": ["som_z", "amerika"],
+      "skill_nodes": ["origin_location"],
+      "explanation": "„z“ changes the noun's ending: Amerika → z Ameriky. The noun's role in the sentence changed — watch the pattern."
+    },
+    {
+      "id": "er_sa_position",
+      "broken": "Môj starý otec narodil sa v Píle.",
+      "fixed": ["môj starý otec sa narodil v píle"],
+      "lexemes": ["narodil_sa", "stary_otec"],
+      "skill_nodes": ["past_tense_birth"],
+      "explanation": "„sa“ wants second position in the clause: „...otec SA narodil...“, not „...narodil sa...“ after the subject phrase."
+    },
+    {
+      "id": "er_jednu_kavu",
+      "broken": "Prosím si jeden káva.",
+      "fixed": ["prosím si jednu kávu"],
+      "lexemes": ["prosim_si", "kava", "jeden"],
+      "skill_nodes": ["wants_requests", "food_drink"],
+      "explanation": "Ordering puts the noun in the accusative and the numeral agrees: jednu kávu (feminine)."
+    },
+    {
+      "id": "er_rozumiem_no",
+      "broken": "Ja no rozumiem.",
+      "fixed": ["nerozumiem", "ja nerozumiem"],
+      "lexemes": ["nerozumiem"],
+      "skill_nodes": ["survival_phrases"],
+      "explanation": "Slovak negation is a prefix on the verb: NErozumiem — not a separate word like English „not“."
+    }
+  ]
+}

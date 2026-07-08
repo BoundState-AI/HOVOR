@@ -37,6 +37,11 @@ class User(Base):
     grammar_depth: Mapped[str] = mapped_column(String(20), default="normal")
     profanity: Mapped[str] = mapped_column(String(20), default="none")
 
+    # Privacy (spec §31): audio is NOT retained unless explicitly opted in,
+    # and research use is a separate consent — no hidden voice training.
+    retain_audio: Mapped[bool] = mapped_column(Boolean, default=False)
+    research_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+
 
 class MasteryEstimate(Base):
     """One row per (user, item, retrieval mode) — the mastery vector of §13.
@@ -111,6 +116,13 @@ class Attempt(Base):
 
     pronunciation_status: Mapped[str] = mapped_column(String(30), default="not_assessed")
 
+    # Speech evidence (spec §8.2, §27, §31): audio kept only under retain_audio
+    # consent; a second independent ASR transcript enables disagreement
+    # measurement — when transcripts disagree, we don't score (spec §12).
+    audio_reference: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    secondary_transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
+    transcript_disagreement: Mapped[float | None] = mapped_column(Float, nullable=True)
+
     scoring_version: Mapped[str] = mapped_column(String(60))
     content_version: Mapped[str] = mapped_column(String(60))
     provider: Mapped[str | None] = mapped_column(String(60), nullable=True)
@@ -126,6 +138,28 @@ class XPEvent(Base):
     attempt_id: Mapped[int | None] = mapped_column(ForeignKey("attempts.id"), nullable=True)
     amount: Mapped[int] = mapped_column(Integer)
     reason: Mapped[str] = mapped_column(String(80))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class UserAchievement(Base):
+    __tablename__ = "user_achievements"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    achievement_id: Mapped[str] = mapped_column(String(60))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class Event(Base):
+    """Observability event log (spec §30): no production AI system without
+    traceability. Everything interesting emits one of these."""
+
+    __tablename__ = "events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    kind: Mapped[str] = mapped_column(String(60), index=True)
+    user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    payload: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 

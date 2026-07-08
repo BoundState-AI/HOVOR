@@ -1,0 +1,47 @@
+{
+  "content_version": "ancestry-slice-0.2.0",
+  "achievements": [
+    {
+      "id": "first_blood",
+      "title": "First Blood",
+      "description": "Your first spoken Slovak understood by another being.",
+      "condition": {"kind": "first_speech_success"}
+    },
+    {
+      "id": "survived_bratislava",
+      "title": "Survived Bratislava",
+      "description": "Complete your first full mission — the arrival.",
+      "condition": {"kind": "mission_complete", "mission_id": "bratislava_arrival"}
+    },
+    {
+      "id": "archive_rat",
+      "title": "Archive Rat",
+      "description": "Walk out of the Modra archive knowing the next step.",
+      "condition": {"kind": "mission_complete", "mission_id": "modra_archive_records"}
+    },
+    {
+      "id": "stop_translating",
+      "title": "Stop Translating",
+      "description": "Complete a mission without falling back to English once.",
+      "condition": {"kind": "mission_complete_no_english"}
+    },
+    {
+      "id": "they_understood_you",
+      "title": "They Understood You",
+      "description": "Complete a mission with at most one hint.",
+      "condition": {"kind": "mission_complete_max_hints", "max_hints": 1}
+    },
+    {
+      "id": "again",
+      "title": "Again?",
+      "description": "Permanently corrected an error you kept repeating.",
+      "condition": {"kind": "recurring_error_resolved"}
+    },
+    {
+      "id": "no_english_run",
+      "title": "Slovak Enough to Get in Trouble",
+      "description": "Win a no-English run.",
+      "condition": {"kind": "mission_complete_no_english_mode"}
+    }
+  ]
+}

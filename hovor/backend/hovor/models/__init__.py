@@ -1,9 +1,11 @@
 from hovor.models.learner import (
     Attempt,
     ErrorObservation,
+    Event,
     LearningSession,
     MasteryEstimate,
     User,
+    UserAchievement,
     XPEvent,
 )
 from hovor.models.voice import ConversationTurn, VoiceSession
@@ -17,4 +19,6 @@ __all__ = [
     "LearningSession",
     "VoiceSession",
     "ConversationTurn",
+    "UserAchievement",
+    "Event",
 ]

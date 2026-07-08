@@ -43,12 +43,24 @@ class ContentBundle:
     skill_nodes: dict[str, SkillNode]
     skill_edges: tuple[tuple[str, str], ...]
     missions: dict[str, dict[str, Any]] = field(default_factory=dict)
+    campaign: dict[str, Any] = field(default_factory=dict)
+    confusion_pairs: tuple[tuple[str, str], ...] = ()
+    repair_items: dict[str, dict[str, Any]] = field(default_factory=dict)
+    achievements: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def lexeme(self, lexeme_id: str) -> Lexeme:
         return self.lexemes[lexeme_id]
 
     def mission(self, mission_id: str) -> dict[str, Any]:
         return self.missions[mission_id]
+
+    def confusion_partner(self, lexeme_id: str) -> str | None:
+        for a, b in self.confusion_pairs:
+            if a == lexeme_id:
+                return b
+            if b == lexeme_id:
+                return a
+        return None
 
 
 def _read(path: Path) -> dict[str, Any]:
@@ -62,6 +74,9 @@ def load_content(content_dir: str | None = None) -> ContentBundle:
     lex_raw = _read(base / "lexemes.json")
     skills_raw = _read(base / "skills.json")
     missions_raw = _read(base / "missions.json")
+    campaign_raw = _read(base / "campaign.json")
+    repair_raw = _read(base / "repair_items.json")
+    achievements_raw = _read(base / "achievements.json")
 
     lexemes = {
         item["id"]: Lexeme(
@@ -91,4 +106,10 @@ def load_content(content_dir: str | None = None) -> ContentBundle:
         skill_nodes=skill_nodes,
         skill_edges=edges,
         missions=missions,
+        campaign=campaign_raw,
+        confusion_pairs=tuple(
+            (p["pair"][0], p["pair"][1]) for p in skills_raw.get("confusion_pairs", [])
+        ),
+        repair_items={item["id"]: item for item in repair_raw["items"]},
+        achievements={a["id"]: a for a in achievements_raw["achievements"]},
     )

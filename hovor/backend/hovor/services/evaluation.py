@@ -127,6 +127,76 @@ def evaluate_recognition(response: str, lexeme: Lexeme) -> EvaluationResult:
     return result
 
 
+def evaluate_repair(response: str, repair_item: dict[str, Any]) -> EvaluationResult:
+    """error_repair exercise (spec §18): the learner produces the corrected
+    sentence. Diacritic slips remain minor; anything else fails with the
+    item's own explanation as the detail."""
+    norm = normalize(response)
+    fixed = [normalize(v) for v in repair_item["fixed"]]
+    result = EvaluationResult(semantic_success=False, normalized_response=norm)
+
+    if norm in fixed:
+        result.semantic_success = True
+        result.target_structure_success = True
+        return result
+    if strip_diacritics(norm) in [strip_diacritics(v) for v in fixed]:
+        result.semantic_success = True
+        result.target_structure_success = True
+        result.errors.append(
+            ErrorTag(
+                tag=f"diacritic_error:{repair_item['id']}",
+                category=CATEGORY_MINOR,
+                detail="Corrected sentence right, diacritics off.",
+            )
+        )
+        return result
+
+    result.errors.append(
+        ErrorTag(
+            tag=f"repair_failure:{repair_item['id']}",
+            category=CATEGORY_GRAMMAR_TARGET,
+            detail=repair_item.get("explanation", ""),
+        )
+    )
+    return result
+
+
+def evaluate_contrast(response: str, target: Lexeme, partner: Lexeme) -> EvaluationResult:
+    """minimal_contrast exercise: distinguish two similar forms. Answering
+    with the partner's meaning is a confusion-pair error — logged so the
+    scheduler can keep drilling the pair (spec §2.2 confusion pairs)."""
+    result = evaluate_recognition(response, target)
+    if result.semantic_success:
+        return result
+    partner_result = evaluate_recognition(response, partner)
+    if partner_result.semantic_success:
+        result.errors = [
+            ErrorTag(
+                tag=f"confusion:{target.id}:{partner.id}",
+                category=CATEGORY_LEXICAL,
+                detail=f"Read '{target.slovak}' as '{partner.slovak}'.",
+            )
+        ]
+    return result
+
+
+def word_disagreement(a: str, b: str) -> float:
+    """Word-level edit-distance ratio between two transcripts, 0.0 (identical)
+    to 1.0 (nothing shared). Used for the independent-ASR agreement check
+    (spec §8.2): above threshold we refuse to score rather than guess."""
+    wa, wb = normalize(a).split(), normalize(b).split()
+    if not wa and not wb:
+        return 0.0
+    prev = list(range(len(wb) + 1))
+    for i, word_a in enumerate(wa, 1):
+        curr = [i]
+        for j, word_b in enumerate(wb, 1):
+            cost = 0 if word_a == word_b else 1
+            curr.append(min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost))
+        prev = curr
+    return prev[-1] / max(len(wa), len(wb))
+
+
 def match_objective(response: str, match_spec: dict[str, Any]) -> bool:
     """Objective matching for missions (spec §5 Phase C, §19): the learner
     succeeds by communicating, not by reciting one canonical sentence.

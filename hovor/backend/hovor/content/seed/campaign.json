@@ -1,0 +1,41 @@
+{
+  "content_version": "ancestry-slice-0.2.0",
+  "campaign_id": "ancestry_journey",
+  "title": "The Journey Home",
+  "description": "Retrace the family line from the Bratislava railway station to the archives of Modra. The map is a game layer over the curriculum graph — geography never gates prerequisite learning (spec 4).",
+  "regions": [
+    {
+      "id": "bratislava",
+      "title": "Bratislava — arrival and survival",
+      "order": 1,
+      "missions": ["bratislava_arrival"],
+      "unlock": {"type": "always"},
+      "focus_skills": ["greetings_basic", "survival_phrases", "travel_transactions", "numbers_basic"]
+    },
+    {
+      "id": "svaty_jur",
+      "title": "Svätý Jur — introductions and family",
+      "order": 2,
+      "missions": ["svaty_jur_family"],
+      "unlock": {"type": "missions_completed", "missions": ["bratislava_arrival"]},
+      "focus_skills": ["identity_statements", "family_vocab", "family_extended", "origin_location"]
+    },
+    {
+      "id": "pezinok",
+      "title": "Pezinok — food, shopping, directions",
+      "order": 3,
+      "missions": [],
+      "status": "planned",
+      "unlock": {"type": "missions_completed", "missions": ["svaty_jur_family"]},
+      "focus_skills": ["food_drink", "places_town", "wants_requests"]
+    },
+    {
+      "id": "modra",
+      "title": "Modra — ancestry, home, the archive",
+      "order": 4,
+      "missions": ["modra_archive_records"],
+      "unlock": {"type": "missions_completed", "missions": ["svaty_jur_family"]},
+      "focus_skills": ["past_tense_birth", "archive_requests"]
+    }
+  ]
+}

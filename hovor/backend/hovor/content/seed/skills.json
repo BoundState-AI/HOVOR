@@ -1,20 +1,47 @@
 {
-  "content_version": "ancestry-slice-0.1.0",
+  "content_version": "ancestry-slice-0.2.0",
   "nodes": [
     {"id": "greetings_basic", "kind": "communicative_function", "title": "Basic greetings", "stage": 0},
     {"id": "survival_phrases", "kind": "communicative_function", "title": "Survival phrases (repeat, slower, don't understand)", "stage": 0},
     {"id": "identity_statements", "kind": "communicative_function", "title": "Identity statements", "stage": 0},
-    {"id": "family_vocab", "kind": "lexical_family", "title": "Family vocabulary", "stage": 1},
+    {"id": "politeness_social", "kind": "communicative_function", "title": "Politeness and social phrases", "stage": 0},
+    {"id": "question_words", "kind": "communicative_function", "title": "Question words", "stage": 1},
+    {"id": "family_vocab", "kind": "lexical_family", "title": "Family vocabulary (core)", "stage": 1},
+    {"id": "family_extended", "kind": "lexical_family", "title": "Family vocabulary (extended)", "stage": 1},
     {"id": "origin_location", "kind": "communicative_function", "title": "Origin and location", "stage": 1},
+    {"id": "numbers_basic", "kind": "lexical_family", "title": "Numbers 1-10, 100, 1000", "stage": 1},
+    {"id": "time_expressions", "kind": "lexical_family", "title": "Time expressions", "stage": 1},
+    {"id": "wants_requests", "kind": "communicative_function", "title": "Wants and requests", "stage": 1},
+    {"id": "food_drink", "kind": "lexical_family", "title": "Food and drink", "stage": 1},
+    {"id": "places_town", "kind": "lexical_family", "title": "Places in town", "stage": 1},
     {"id": "past_tense_birth", "kind": "morphological_pattern", "title": "Past tense: birth and life statements", "stage": 1},
-    {"id": "archive_requests", "kind": "communicative_function", "title": "Archive and records requests", "stage": 1}
+    {"id": "travel_transactions", "kind": "communicative_function", "title": "Travel transactions (tickets, prices, platforms)", "stage": 2},
+    {"id": "archive_requests", "kind": "communicative_function", "title": "Archive and records requests", "stage": 2}
   ],
   "edges": [
     {"from": "greetings_basic", "to": "identity_statements"},
+    {"from": "greetings_basic", "to": "politeness_social"},
     {"from": "identity_statements", "to": "origin_location"},
+    {"from": "identity_statements", "to": "wants_requests"},
+    {"from": "survival_phrases", "to": "question_words"},
+    {"from": "family_vocab", "to": "family_extended"},
     {"from": "family_vocab", "to": "past_tense_birth"},
     {"from": "origin_location", "to": "past_tense_birth"},
+    {"from": "origin_location", "to": "places_town"},
+    {"from": "numbers_basic", "to": "time_expressions"},
+    {"from": "numbers_basic", "to": "travel_transactions"},
+    {"from": "wants_requests", "to": "travel_transactions"},
+    {"from": "wants_requests", "to": "food_drink"},
     {"from": "past_tense_birth", "to": "archive_requests"},
     {"from": "survival_phrases", "to": "archive_requests"}
+  ],
+  "confusion_pairs": [
+    {"pair": ["kde", "kedy"], "note": "where vs when — form-similar interrogatives"},
+    {"pair": ["mesto", "miesto"], "note": "town vs place — one letter apart"},
+    {"pair": ["syn", "syr"], "note": "son vs cheese — one letter apart"},
+    {"pair": ["dobry_den", "dobry_vecer"], "note": "time-of-day greetings"},
+    {"pair": ["rozumiem", "nerozumiem"], "note": "negation prefix easily missed in listening"},
+    {"pair": ["spiatocny", "jednosmerny"], "note": "return vs one-way — high-stakes at ticket counters"},
+    {"pair": ["pivo", "vino"], "note": "beer vs wine — semantically adjacent orders"}
   ]
 }

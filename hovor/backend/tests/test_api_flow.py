@@ -6,7 +6,7 @@ Modra archive mission, and gets an honest debrief."""
 def test_health_reports_content_version(client):
     body = client.get("/health").json()
     assert body["status"] == "ok"
-    assert body["content_version"] == "ancestry-slice-0.1.0"
+    assert body["content_version"] == "ancestry-slice-0.2.0"
     assert body["content_review_status"] == "PENDING_NATIVE_REVIEW"
 
 
@@ -23,7 +23,8 @@ def test_full_session_loop(client):
     # Skill graph orders introduction: stage-0 material comes first.
     first_item = plan["phase_b"][0]["introduce"]
     assert set(first_item["skill_nodes"]) & {"greetings_basic", "survival_phrases", "identity_statements"}
-    assert plan["phase_c"]["mission_id"] == "modra_archive_records"
+    # New learner gets the campaign's first unlocked mission: arrival.
+    assert plan["phase_c"]["mission_id"] == "bratislava_arrival"
 
     # Phase B: introduce + immediate production. One success, one failure.
     ex_ok = plan["phase_b"][0]["exercise"]

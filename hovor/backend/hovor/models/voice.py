@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from hovor.core.db import Base
@@ -26,6 +26,11 @@ class VoiceSession(Base):
     # Objective progress: {objective_id: {"status": "pending|completed", ...}}
     objective_state: Mapped[dict] = mapped_column(JSON, default=dict)
     hint_levels: Mapped[dict] = mapped_column(JSON, default=dict)  # objective_id -> int
+
+    # No-English run (spec §16.5): deep hints cost XP; English turns are
+    # tracked either way for the learner model's English-dependence signal.
+    no_english: Mapped[bool] = mapped_column(Boolean, default=False)
+    english_turns: Mapped[int] = mapped_column(Integer, default=0)
 
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
