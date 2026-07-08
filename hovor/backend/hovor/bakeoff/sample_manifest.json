@@ -1,0 +1,18 @@
+{
+  "manifest_version": "1",
+  "notes": "Starter manifest covering spec 9.3 content categories. audio_path fields are absent until the native-speaker panel records them; providers report those utterances as failures rather than faking results.",
+  "utterances": [
+    {"id": "u001", "reference": "Dobrý deň, volám sa Ján Kováč.", "speaker": {"type": "native", "gender": "m", "age_band": "40s"}, "condition": "quiet", "proper_nouns": ["Ján Kováč"], "tags": ["identity"]},
+    {"id": "u002", "reference": "Môj prastarý otec sa narodil v Píle, pri Modre.", "speaker": {"type": "learner", "gender": "m", "age_band": "30s", "accent": "en-US"}, "condition": "quiet", "proper_nouns": ["Píla", "Modra"], "tags": ["genealogy", "declension"]},
+    {"id": "u003", "reference": "Prosím si jednosmerný lístok do Pezinka.", "speaker": {"type": "learner", "gender": "f", "age_band": "30s", "accent": "en-US"}, "condition": "street", "proper_nouns": ["Pezinok"], "tags": ["travel", "declension"]},
+    {"id": "u004", "reference": "Vlak odchádza o desiatej z tretieho nástupišťa.", "speaker": {"type": "native", "gender": "f", "age_band": "20s"}, "condition": "vehicle", "proper_nouns": [], "tags": ["numbers", "time"]},
+    {"id": "u005", "reference": "Narodil sa deviateho marca tisícosemstodeväťdesiatosem.", "speaker": {"type": "native", "gender": "m", "age_band": "60s"}, "condition": "quiet", "proper_nouns": [], "tags": ["dates", "numbers", "genealogy"]},
+    {"id": "u006", "reference": "Hľadám rodný list v štátnom archíve v Modre.", "speaker": {"type": "learner", "gender": "m", "age_band": "30s", "accent": "en-US"}, "condition": "cheap_earbuds", "proper_nouns": ["Modra"], "tags": ["genealogy"]},
+    {"id": "u007", "reference": "Bývame v Svätom Jure pri Bratislave.", "speaker": {"type": "native", "gender": "f", "age_band": "50s"}, "condition": "quiet", "proper_nouns": ["Svätý Jur", "Bratislava"], "tags": ["declension", "proper_nouns"]},
+    {"id": "u008", "reference": "Kde je stanica? Kedy odchádza vlak?", "speaker": {"type": "learner", "gender": "f", "age_band": "40s", "accent": "en-US"}, "condition": "street", "proper_nouns": [], "tags": ["minimal_contrast"]},
+    {"id": "u009", "reference": "Päť, šesť, sedem, osem, deväť, desať.", "speaker": {"type": "native", "gender": "m", "age_band": "30s"}, "condition": "fast", "proper_nouns": [], "tags": ["numbers", "diacritics"]},
+    {"id": "u010", "reference": "Ehm... môj starý otec... on žil v dedine... v Píle.", "speaker": {"type": "learner", "gender": "m", "age_band": "30s", "accent": "en-US"}, "condition": "hesitation", "proper_nouns": ["Píla"], "tags": ["hesitation", "self_correction", "genealogy"]},
+    {"id": "u011", "reference": "Banská Bystrica je krásne mesto.", "speaker": {"type": "native", "gender": "f", "age_band": "20s"}, "condition": "airpods", "proper_nouns": ["Banská Bystrica"], "tags": ["proper_nouns"]},
+    {"id": "u012", "reference": "Ďakujem pekne, dovidenia.", "speaker": {"type": "learner", "gender": "f", "age_band": "60s", "accent": "en-US"}, "condition": "phone_mic", "proper_nouns": [], "tags": ["politeness", "diacritics"]}
+  ]
+}

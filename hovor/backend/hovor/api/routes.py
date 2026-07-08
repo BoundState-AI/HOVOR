@@ -31,11 +31,15 @@ def get_content() -> ContentBundle:
     return load_content()
 
 
-def _provider_for(name: str) -> MockVoiceProvider:
-    # Adapter registry (spec §7). Real adapters (OpenAI Realtime, GPT-Live,
-    # Azure, ...) register here without touching anything above the boundary.
+def _provider_for(name: str):
+    # Adapter registry (spec §7). Everything above this line is provider-neutral;
+    # a future GPT-Live adapter registers here and nothing else changes.
     if name in ("mock", "mock-0.1"):
         return MockVoiceProvider()
+    if name == "openai-realtime":
+        from hovor.voice.openai_realtime import OpenAIRealtimeProvider
+
+        return OpenAIRealtimeProvider()  # needs OPENAI_API_KEY at session start
     raise HTTPException(status_code=400, detail=f"unknown voice provider: {name}")
 
 
