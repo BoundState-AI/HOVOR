@@ -3,7 +3,10 @@
    recognition where available (input_mode=speech so the backend treats it
    as a transcript). */
 
-const API = "/api/v1";
+// Served at {prefix}/app/ — locally the prefix is empty; behind the
+// boundstate.ai reverse proxy it is /hovor. Derive it, don't hardcode it.
+const ROOT = location.pathname.replace(/\/app(\/.*)?$/, "");
+const API = ROOT + "/api/v1";
 let user = null;
 let session = null;   // {session_id, plan}
 let voice = null;     // {voice_session_id, mission_id}

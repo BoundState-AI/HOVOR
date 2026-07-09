@@ -17,9 +17,5 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
-      - name: Install
-        run: |
-          uv venv
-          uv pip install -e ".[dev,realtime]"
       - name: Test
-        run: .venv/bin/python -m pytest tests/ -v
+        run: uv run --extra dev --extra realtime python -m pytest tests/ -v

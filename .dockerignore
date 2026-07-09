@@ -1,0 +1,13 @@
+# Secrets must never enter the image — OPENAI_API_KEY is a Railway variable.
+backend/.env
+.env
+
+.git/
+.github/
+ios/
+docs/
+backend/.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.db
+*.egg-info/

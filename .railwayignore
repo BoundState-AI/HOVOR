@@ -1,0 +1,10 @@
+# Keep the upload context lean and secret-free.
+backend/.env
+.env
+backend/.venv/
+**/__pycache__/
+**/.pytest_cache/
+*.db
+ios/
+docs/
+.github/
