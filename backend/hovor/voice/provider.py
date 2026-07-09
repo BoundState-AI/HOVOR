@@ -4,7 +4,7 @@ No provider-specific event formats are allowed above this boundary. The
 OpenAI Realtime adapter, a future GPT-Live adapter, Azure/Google/ElevenLabs
 adapters, and the deterministic mock all speak this contract.
 
-The iOS client mirrors this as a Swift protocol (see hovor/docs/ARCHITECTURE.md).
+The iOS client mirrors this as a Swift protocol (see docs/ARCHITECTURE.md).
 """
 
 from abc import ABC, abstractmethod
