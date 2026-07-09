@@ -1,0 +1,33 @@
+# macOS runners bill private-repo minutes at 10x, so this job only runs when
+# iOS code actually changes (or on manual dispatch).
+#
+# Covers the HovorKit package: unit tests on macOS, plus an iOS-Simulator
+# compile to validate the iOS 17 target. The HovorApp shell has no Xcode
+# project yet — once one exists (XcodeGen), add an xcodebuild step for it.
+name: ios
+
+on:
+  push:
+    branches: [main]
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  pull_request:
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+jobs:
+  hovorkit:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: ios/HovorKit
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: swift --version && xcodebuild -version
+      - name: Unit tests (macOS target)
+        run: swift test
+      - name: Compile for iOS Simulator (iOS 17 target)
+        run: |
+          xcodebuild build -scheme HovorKit \
+            -destination 'generic/platform=iOS Simulator' \
+            -skipPackagePluginValidation

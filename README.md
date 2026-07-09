@@ -35,7 +35,7 @@ uv run python -m hovor.bakeoff hovor/bakeoff/sample_manifest.json --providers mo
 | No-English runs with XP-cost emergency help | §16.5 | ✅ tested |
 | Tutor strictness → hint ladder shape (ruthless never reveals) | §11 §22 | ✅ tested |
 | Provider-neutral voice boundary + deterministic mock | §7 | ✅ tested |
-| OpenAI Realtime adapter (injectable transport; fake-transport tests) | §6.2 | ✅ code-tested, ⏳ live pending key |
+| OpenAI Realtime adapter (injectable transport; fake-transport tests) | §6.2 | ✅ live-verified (GA wire format) |
 | Provider failure ≠ learner failure; degraded push-to-talk | §32 §34.11 | ✅ tested |
 | Dual-transcript agreement gate ("let's not score it") | §8.2 §12 | ✅ tested |
 | Build 0 bakeoff: WER/CER/diacritic/proper-noun/latency → report | §9 §33 | ✅ harness tested, ⏳ needs keys + native audio |
@@ -50,14 +50,19 @@ uv run python -m hovor.bakeoff hovor/bakeoff/sample_manifest.json --providers mo
 
 1. **Native Slovak review** (§21) — every lexeme, mission line, and repair
    item is machine-authored and flagged. This is the gate before real users.
+   No native speaker in your network needed — see `docs/NATIVE_REVIEW.md`
+   for the remote-hire playbook.
 2. **OPENAI_API_KEY** — flips the mission engine from the deterministic mock
-   to live spoken Slovak via the already-tested Realtime adapter.
-3. **Bakeoff audio** — the manifest format and metrics are ready; the
-   native-speaker panel recordings (§9.1) make the report real.
-4. **Xcode** — the iOS package targets iOS 17/Swift 5.9 but has never been
-   compiled; expect a shakedown pass.
+   to live spoken Slovak via the Realtime adapter (live-verified). Put it in
+   `backend/.env` (gitignored, loaded automatically) per machine/deploy.
+3. **Bakeoff audio** — the manifest format and metrics are ready. Half the
+   panel is learner-accent audio you can record yourself; the native half is
+   the same hire as item 1 (`docs/NATIVE_REVIEW.md`).
+4. **Xcode** — HovorKit now builds and tests in CI on a macOS runner
+   (`.github/workflows/ios.yml`); the app shell still needs an Xcode project.
 5. **Pronunciation engine** (Build 5, §10) — intentionally absent until an
-   opt-in speech corpus exists to calibrate against.
+   opt-in **learner** speech corpus exists (collected via the tested consent
+   flows, §31). Not blocked on native speakers; unblocks with real usage.
 
 ## Layout
 
