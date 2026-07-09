@@ -107,13 +107,18 @@ class OpenAIRealtimeProvider(VoiceProvider):
         self._config = config
         try:
             self._transport = self._factory()
+            # GA realtime wire format (2025-08+): session.type is required,
+            # modalities → output_modalities, voice/transcription live under audio.
             self._transport.send(
                 {
                     "type": "session.update",
                     "session": {
-                        "modalities": ["text", "audio"],
-                        "voice": config.get("voice", "marin"),
-                        "input_audio_transcription": {"language": "sk"},
+                        "type": "realtime",
+                        "output_modalities": ["audio"],
+                        "audio": {
+                            "input": {"transcription": {"model": "gpt-4o-transcribe", "language": "sk"}},
+                            "output": {"voice": config.get("voice", "marin")},
+                        },
                     },
                 }
             )

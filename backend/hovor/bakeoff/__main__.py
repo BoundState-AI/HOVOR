@@ -7,6 +7,7 @@ result for a provider it can't reach.
 import argparse
 import sys
 
+from hovor.core import config as _config  # noqa: F401  (loads backend/.env provider keys)
 from hovor.bakeoff.manifest import load_manifest
 from hovor.bakeoff.providers import REGISTRY, ProviderNotConfigured
 from hovor.bakeoff.runner import render_markdown, run_bakeoff

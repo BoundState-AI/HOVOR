@@ -1,6 +1,12 @@
 from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
+
+# Project-local .env (backend/.env, gitignored) wins over inherited shell env:
+# this machine carries a global OPENAI_API_KEY for other projects, and HOVOR
+# must use its own key, not silently bill a neighbor's.
+load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env", override=True)
 
 
 class Settings(BaseSettings):
