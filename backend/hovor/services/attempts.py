@@ -131,6 +131,21 @@ def _maybe_resolve_recurring(
     return game.check_recurring_resolved(db, user_id, content)
 
 
+def _expected_answer(exercise_id: str, item_id: str, mode: str, content: ContentBundle) -> tuple[str | None, bool]:
+    """The corrected form to show after a miss (spec §12: restate correctly,
+    don't leave the learner with a raw error tag). Second element: whether
+    the string is Slovak content the TTS endpoint can pronounce."""
+    if exercise_id.startswith("repair:"):
+        item = content.repair_items.get(item_id)
+        return (item["fixed"][0], True) if item else (None, False)
+    if item_id not in content.lexemes:
+        return None, False
+    lexeme = content.lexeme(item_id)
+    if exercise_id.startswith("dictation:") or not mode.startswith("recognition"):
+        return lexeme.slovak, True
+    return lexeme.english, False
+
+
 def submit_exercise_attempt(
     db: Session,
     user_id: int,
@@ -224,4 +239,9 @@ def submit_exercise_attempt(
         achievements += _maybe_resolve_recurring(db, user_id, item_id, mode, content)
 
     db.flush()
-    return attempt, {"focus": _focus_state(db, user_id, session_id), "achievements": achievements}
+    extras = {"focus": _focus_state(db, user_id, session_id), "achievements": achievements}
+    if not result.semantic_success:
+        extras["expected"], extras["expected_speakable"] = _expected_answer(
+            exercise_id, item_id, mode, content
+        )
+    return attempt, extras

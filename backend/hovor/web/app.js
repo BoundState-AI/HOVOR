@@ -159,13 +159,20 @@ function showExercise(step) {
     }
     let cls = out.semantic_success ? "ok" : "bad";
     let msg = out.semantic_success ? "✓ Correct" : "✗ Not quite";
-    if (out.error_tags.length) msg += ` — ${out.error_tags.join(", ")}`;
+    // A miss shows the corrected form (spec §12) — never a raw error tag.
+    if (!out.semantic_success && out.expected) {
+      msg += ` — it's: <b>${out.expected}</b>${out.expected_speakable ? " " + speakBtn("spk-fix") : ""}`;
+    }
     if (out.xp_awarded) msg += ` <span class="xp-pop">+${out.xp_awarded} XP</span>`;
     if (out.note) { cls = "note"; msg = out.note; }
     $("#fb").innerHTML = `<div class="feedback ${cls}">${msg}</div>` +
       (out.focus.state !== "ok" ? `<div class="feedback note">${out.focus.advice}</div>` : "") +
       (out.achievements || []).map((a) => `<div class="feedback note">🏅 ${a.title}</div>`).join("") +
       `<div class="row"><button id="next">Continue</button></div>`;
+    if (out.expected_speakable) {
+      const sayFix = wireSpeak("spk-fix", out.expected);
+      if (sayFix) sayFix(); // hear the correct form the moment you miss it
+    }
     $("#next").onclick = () => { refreshSidebar(); nextStep(); };
   };
   $("#submit").onclick = submit;

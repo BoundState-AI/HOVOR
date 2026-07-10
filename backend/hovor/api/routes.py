@@ -27,6 +27,7 @@ from hovor.voice.provider import ProviderError
 from hovor.voice.transcribe import (
     MAX_AUDIO_BYTES,
     TranscriptionUnavailable,
+    ensure_latin,
     openai_transcribe,
 )
 from hovor.voice.tts import (
@@ -96,7 +97,9 @@ async def transcribe(
                            audio.content_type or "audio/webm")
     except TranscriptionUnavailable as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-    return {"text": text}
+    # Belt over the transcriber's own suspenders: a learner's Slovak must
+    # never echo back in Cyrillic, whatever backend produced the text.
+    return {"text": ensure_latin(text)}
 
 
 def _provider_for(name: str):
@@ -219,6 +222,8 @@ def submit_attempt(
         focus=extras.get("focus", {}),
         achievements=extras.get("achievements", []),
         note=extras.get("note"),
+        expected=extras.get("expected"),
+        expected_speakable=extras.get("expected_speakable", False),
     )
 
 

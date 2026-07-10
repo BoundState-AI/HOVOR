@@ -49,6 +49,9 @@ class AttemptOut(BaseModel):
     focus: dict = Field(default_factory=dict)
     achievements: list[dict] = Field(default_factory=list)
     note: str | None = None
+    # Corrected form after a miss (spec §12) + whether TTS can pronounce it.
+    expected: str | None = None
+    expected_speakable: bool = False
 
 
 class VoiceSessionStart(BaseModel):
