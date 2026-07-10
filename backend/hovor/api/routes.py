@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
@@ -24,12 +24,50 @@ from hovor.services.session_composer import compose_session
 from hovor.voice.mock_provider import MockVoiceProvider
 from hovor.voice.orchestrator import MissionOrchestrator
 from hovor.voice.provider import ProviderError
+from hovor.voice.tts import (
+    MAX_TEXT_LEN,
+    Synthesizer,
+    TTSUnavailable,
+    openai_synthesize,
+    speakable_strings,
+    synthesize_cached,
+)
 
 router = APIRouter(prefix="/api/v1")
 
 
 def get_content() -> ContentBundle:
     return load_content()
+
+
+def get_synthesizer() -> Synthesizer:
+    return openai_synthesize
+
+
+@router.get("/tts")
+def pronounce(
+    text: str,
+    content: ContentBundle = Depends(get_content),
+    synthesizer: Synthesizer = Depends(get_synthesizer),
+) -> Response:
+    """Pronunciation audio for a known content string (spec §18). Models
+    pronunciation only — grading stays absent until Build 5 (§2.3)."""
+    text = text.strip()
+    if not text or len(text) > MAX_TEXT_LEN:
+        raise HTTPException(status_code=400, detail="text is empty or too long")
+    if text not in speakable_strings(content):
+        raise HTTPException(status_code=404, detail="not a known content string")
+    try:
+        audio = synthesize_cached(text, synthesizer)
+    except TTSUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return Response(
+        content=audio,
+        media_type="audio/mpeg",
+        # Content strings are versioned and finite: cache hard at the edge
+        # and in the browser so each word is synthesized ~once, ever.
+        headers={"Cache-Control": "public, max-age=604800"},
+    )
 
 
 def _provider_for(name: str):

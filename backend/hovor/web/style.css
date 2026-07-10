@@ -45,3 +45,5 @@ input[type=text] { background: var(--panel2); border: 1px solid var(--border); c
 .debrief ul { margin-left: 20px; }
 .xp-pop { color: var(--gold); font-weight: 700; }
 .small { font-size: 13px; color: var(--dim); }
+.spk { background: transparent; border: 0; padding: 0 4px; font-size: 20px; cursor: pointer; vertical-align: middle; }
+.spk:hover { transform: scale(1.15); }

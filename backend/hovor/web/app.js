@@ -112,22 +112,35 @@ function showIntroduce(step) {
   const it = step.item;
   screen().innerHTML = `<div class="card">
     <div class="phase-label">Phase ${step.phase}</div>
-    <div class="prompt">${it.slovak}</div>
+    <div class="prompt">${it.slovak} ${speakBtn("spk-intro")}</div>
     <div class="instruction">${it.english} <span class="small">(${it.register})</span></div>
     <button id="next">Got it</button></div>`;
+  const say = wireSpeak("spk-intro", it.slovak);
+  if (say) say(); // model the sound the moment a word is introduced
   $("#next").onclick = nextStep;
 }
 
 function showExercise(step) {
   const ex = step.ex;
   promptShownAt = Date.now();
+  // listen_type is a true listening exercise: hide the text, play the audio.
+  // If TTS can't run, reveal the text — a broken speaker never blocks learning.
+  const isListening = ex.type === "listen_type";
+  const promptHtml = isListening
+    ? `<span id="ptext" style="display:none">${ex.prompt}</span><span id="pmask">🎧 …</span> ${speakBtn("spk-ex")}`
+    : `${ex.prompt} ${speakBtn("spk-ex")}${ex.contrast_with ? ` <span class="small">vs ${ex.contrast_with}</span>` : ""}`;
   screen().innerHTML = `<div class="card">
     <div class="phase-label">Phase ${step.phase} · ${ex.type}</div>
-    <div class="prompt">${ex.prompt}${ex.contrast_with ? ` <span class="small">vs ${ex.contrast_with}</span>` : ""}</div>
+    <div class="prompt">${promptHtml}</div>
     <div class="instruction">${ex.instruction}${ex.time_budget_ms ? " ⏱" : ""}</div>
     <div class="row"><input type="text" id="answer" autocomplete="off">
     ${micButton()}<button id="submit">Answer</button></div>
     <div id="fb"></div></div>`;
+  const say = wireSpeak("spk-ex", ex.prompt, isListening ? () => {
+    $("#ptext").style.display = "";
+    $("#pmask").style.display = "none";
+  } : null);
+  if (isListening && say) say();
   wireMic($("#answer"));
   const submit = async () => {
     const response = $("#answer").value.trim();
@@ -139,6 +152,11 @@ function showExercise(step) {
       input_mode: window._lastInputWasSpeech ? "speech" : "text",
     });
     window._lastInputWasSpeech = false;
+    if (isListening) {
+      // Answer's in: reveal what was actually said.
+      $("#ptext").style.display = "";
+      $("#pmask").style.display = "none";
+    }
     let cls = out.semantic_success ? "ok" : "bad";
     let msg = out.semantic_success ? "✓ Correct" : "✗ Not quite";
     if (out.error_tags.length) msg += ` — ${out.error_tags.join(", ")}`;
@@ -159,6 +177,27 @@ function showExercise(step) {
 
 function liveTutor() {
   return localStorage.getItem("hovor_live_tutor") === "1";
+}
+
+/* Pronunciation on demand: GET /tts only speaks known content strings, so a
+   rejected play (English prompt, no key) just greys the button out. */
+function speakBtn(id) {
+  return `<button class="spk" id="${id}" title="Hear it">🔊</button>`;
+}
+
+function wireSpeak(id, text, onFail) {
+  const btn = $(`#${id}`);
+  if (!btn) return;
+  const say = () => {
+    const audio = new Audio(`${API}/tts?text=${encodeURIComponent(text)}`);
+    audio.play().catch(() => {
+      btn.style.opacity = 0.25;
+      btn.disabled = true;
+      if (onFail) onFail();
+    });
+  };
+  btn.onclick = say;
+  return say;
 }
 
 function playTutorAudio(b64) {
