@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
@@ -24,6 +24,11 @@ from hovor.services.session_composer import compose_session
 from hovor.voice.mock_provider import MockVoiceProvider
 from hovor.voice.orchestrator import MissionOrchestrator
 from hovor.voice.provider import ProviderError
+from hovor.voice.transcribe import (
+    MAX_AUDIO_BYTES,
+    TranscriptionUnavailable,
+    openai_transcribe,
+)
 from hovor.voice.tts import (
     MAX_TEXT_LEN,
     Synthesizer,
@@ -68,6 +73,30 @@ def pronounce(
         # and in the browser so each word is synthesized ~once, ever.
         headers={"Cache-Control": "public, max-age=604800"},
     )
+
+
+def get_transcriber():
+    return openai_transcribe
+
+
+@router.post("/transcribe")
+async def transcribe(
+    audio: UploadFile,
+    transcriber=Depends(get_transcriber),
+) -> dict:
+    """Push-to-talk speech-to-text (spec §8). The clip is transcribed and
+    discarded — never stored (§31)."""
+    data = await audio.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="empty audio")
+    if len(data) > MAX_AUDIO_BYTES:
+        raise HTTPException(status_code=413, detail="audio too large")
+    try:
+        text = transcriber(data, audio.filename or "speech.webm",
+                           audio.content_type or "audio/webm")
+    except TranscriptionUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return {"text": text}
 
 
 def _provider_for(name: str):

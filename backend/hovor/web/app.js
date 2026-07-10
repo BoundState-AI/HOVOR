@@ -287,24 +287,69 @@ async function showDebrief() {
 /* ---------- speech input (browser Slovak ASR where available) ---------- */
 
 function micButton() {
-  const supported = "webkitSpeechRecognition" in window || "SpeechRecognition" in window;
-  return supported ? `<button class="mic" id="mic" title="Hold to speak Slovak">🎤</button>` : "";
+  const supported = !!(navigator.mediaDevices && window.MediaRecorder);
+  return supported ? `<button class="mic" id="mic" title="Tap, speak Slovak, tap again">🎤</button>` : "";
 }
 
+/* Push-to-talk: record in the browser (works everywhere, including iOS),
+   transcribe server-side in Slovak. Tap to start, tap to stop; errors are
+   shown on the button — never a silent no-op. */
 function wireMic(input) {
   const btn = $("#mic");
   if (!btn) return;
-  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const rec = new Rec();
-  rec.lang = "sk-SK";
-  rec.interimResults = false;
-  btn.onclick = () => { btn.classList.add("listening"); rec.start(); };
-  rec.onresult = (e) => {
-    input.value = e.results[0][0].transcript;
-    window._lastInputWasSpeech = true;
-    btn.classList.remove("listening");
+  let recorder = null;
+  let autoStop = null;
+
+  const fail = (label) => {
+    btn.classList.remove("listening", "busy");
+    btn.textContent = label;
+    setTimeout(() => (btn.textContent = "🎤"), 2500);
   };
-  rec.onerror = rec.onend = () => btn.classList.remove("listening");
+
+  const start = async () => {
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch {
+      return fail("🎤 blocked");
+    }
+    const chunks = [];
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    recorder.onstop = async () => {
+      clearTimeout(autoStop);
+      stream.getTracks().forEach((t) => t.stop());
+      btn.classList.remove("listening");
+      btn.classList.add("busy");
+      btn.textContent = "…";
+      try {
+        const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+        const fd = new FormData();
+        fd.append("audio", blob, "speech." + ((recorder.mimeType || "webm").includes("mp4") ? "mp4" : "webm"));
+        const res = await fetch(`${API}/transcribe`, { method: "POST", body: fd });
+        if (!res.ok) throw new Error(res.status);
+        const out = await res.json();
+        btn.classList.remove("busy");
+        btn.textContent = "🎤";
+        if (!out.text) return fail("🎤 nič?");
+        input.value = out.text;
+        window._lastInputWasSpeech = true;
+        input.focus();
+      } catch {
+        fail("🎤 offline");
+      }
+      recorder = null;
+    };
+    recorder.start();
+    btn.classList.add("listening");
+    btn.textContent = "⏹";
+    autoStop = setTimeout(() => recorder && recorder.state === "recording" && recorder.stop(), 15000);
+  };
+
+  btn.onclick = () => {
+    if (recorder && recorder.state === "recording") recorder.stop();
+    else if (!btn.classList.contains("busy")) start();
+  };
 }
 
 /* ---------- boot ---------- */

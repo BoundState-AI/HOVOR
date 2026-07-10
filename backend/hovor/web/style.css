@@ -47,3 +47,20 @@ input[type=text] { background: var(--panel2); border: 1px solid var(--border); c
 .small { font-size: 13px; color: var(--dim); }
 .spk { background: transparent; border: 0; padding: 0 4px; font-size: 20px; cursor: pointer; vertical-align: middle; }
 .spk:hover { transform: scale(1.15); }
+.mic.busy { opacity: .6; }
+
+/* ---------- mobile ---------- */
+@media (max-width: 820px) {
+  #app { flex-direction: column; }
+  /* Learner's work first; map, stats and achievements below it. */
+  #main { order: 1; padding: 14px; max-width: 100%; }
+  #sidebar { order: 2; width: 100%; border-right: 0; border-top: 1px solid var(--border); }
+  #sidebar h1 { font-size: 22px; }
+  .card { padding: 16px; }
+  .prompt { font-size: 22px; }
+  .row { flex-wrap: wrap; }
+  .row input[type=text] { flex: 1 1 100%; }
+  .row button, .row .mic { flex: 1; min-height: 46px; }
+  .chat { max-height: 48vh; }
+  .msg { max-width: 92%; }
+}
