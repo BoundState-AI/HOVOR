@@ -164,11 +164,15 @@ def start_session(
 
 
 @router.get("/learning-sessions/{session_id}/debrief")
-def debrief(session_id: int, db: Session = Depends(get_db)):
+def debrief(
+    session_id: int,
+    db: Session = Depends(get_db),
+    content: ContentBundle = Depends(get_content),
+):
     session = db.get(LearningSession, session_id)
     if session is None:
         raise HTTPException(status_code=404, detail="session not found")
-    return build_debrief(db, session.user_id, session_id)
+    return build_debrief(db, session.user_id, session_id, content)
 
 
 # -- attempts ----------------------------------------------------------------

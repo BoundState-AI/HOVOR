@@ -27,6 +27,7 @@ from hovor.services.evaluation import (
     evaluate_production,
     evaluate_recognition,
     evaluate_repair,
+    known_error_tags,
     word_disagreement,
 )
 
@@ -160,6 +161,11 @@ def submit_exercise_attempt(
     secondary_transcript: str | None = None,
 ) -> tuple[Attempt, dict]:
     result, targets, item_id, mode = _evaluate(exercise_id, response, content)
+
+    # A failed production that matches a KNOWN mistake pattern gets named:
+    # the repair library says exactly why it's wrong (spec §12).
+    if not result.semantic_success and mode.startswith("production"):
+        result.errors.extend(known_error_tags(response, content.repair_items, skip_item=item_id))
 
     # Independent-ASR agreement gate (spec §8.2, §12): if two transcripts of
     # the same speech disagree badly, refuse to score rather than guess.

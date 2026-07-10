@@ -1,0 +1,38 @@
+{
+  "content_version": "ancestry-slice-0.2.0",
+  "review_status": "PENDING_NATIVE_REVIEW",
+  "notes": {
+    "diacritic_error": {
+      "title": "Mäkčeň a dĺžeň",
+      "explanation": "Diacritics aren't decoration — the dĺžeň (´) lengthens the vowel and the mäkčeň (ˇ) softens the consonant. 'a' and 'á' are different sounds, 'c' and 'č' different letters. Slovak spelling is phonetic: write exactly what you hear."
+    },
+    "ending_error": {
+      "title": "Endings do the work",
+      "explanation": "Slovak declines: word endings carry the grammar English does with word order and prepositions. 'Pezinok' becomes 'do Pezinka' (to) and 'v Pezinku' (in). Your stem was right — it's the ending that changes."
+    },
+    "word_order": {
+      "title": "Second position",
+      "explanation": "Slovak word order is freer than English, but the little grammar words (sa, si, som, mi, ti) lock into second position: 'Volám sa Ján', but 'Ako sa voláš?' — 'sa' rides in slot two either way."
+    },
+    "retrieval_failure": {
+      "title": "It didn't surface",
+      "explanation": "That's forgetting doing its job. The word is rescheduled to come back sooner — meeting it right at the edge of forgetting is exactly what makes it stick."
+    },
+    "recognition_failure": {
+      "title": "Seen but not connected",
+      "explanation": "You've met this word, but the meaning didn't connect this time. Recognition and speaking are tracked separately — this one just needs more listening and reading reps."
+    },
+    "confusion": {
+      "title": "Lookalikes collided",
+      "explanation": "Two similar words collided. Slovak is full of minimal pairs — the contrast drills will keep pairing these until they separate in your head."
+    },
+    "english_dependence": {
+      "title": "Reached for English",
+      "explanation": "You leaned on English mid-sentence. Completely normal at this stage — when you're ready, the no-English runs are designed to wean this off."
+    },
+    "transcript_disagreement": {
+      "title": "Not scored",
+      "explanation": "Two transcription engines heard different things, so nothing was scored — uncertainty is never held against you."
+    }
+  }
+}

@@ -47,6 +47,9 @@ class ContentBundle:
     confusion_pairs: tuple[tuple[str, str], ...] = ()
     repair_items: dict[str, dict[str, Any]] = field(default_factory=dict)
     achievements: dict[str, dict[str, Any]] = field(default_factory=dict)
+    # Learner-facing grammar explanations keyed by error-tag prefix (spec §12,
+    # §5D) — content, not code, so the native reviewer owns the pedagogy.
+    grammar_notes: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def lexeme(self, lexeme_id: str) -> Lexeme:
         return self.lexemes[lexeme_id]
@@ -77,6 +80,7 @@ def load_content(content_dir: str | None = None) -> ContentBundle:
     campaign_raw = _read(base / "campaign.json")
     repair_raw = _read(base / "repair_items.json")
     achievements_raw = _read(base / "achievements.json")
+    grammar_raw = _read(base / "grammar_notes.json")
 
     lexemes = {
         item["id"]: Lexeme(
@@ -112,4 +116,5 @@ def load_content(content_dir: str | None = None) -> ContentBundle:
         ),
         repair_items={item["id"]: item for item in repair_raw["items"]},
         achievements={a["id"]: a for a in achievements_raw["achievements"]},
+        grammar_notes=grammar_raw["notes"],
     )

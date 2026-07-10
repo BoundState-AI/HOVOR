@@ -287,7 +287,8 @@ function updateObjectives(state) {
 async function showDebrief() {
   const d = await api("GET", `/learning-sessions/${session.session_id}/debrief`);
   const errs = d.important_errors
-    .map((e) => `<li>${e.error_tag}${e.recurring ? " <b>(recurring)</b>" : ""}</li>`).join("");
+    .map((e) => `<li>${e.label ? `<b>${e.label}</b> — ` : ""}${e.title ? `<b>${e.title}.</b> ` : ""}${e.explanation || ""}${e.recurring ? ' <span class="xp-pop">Again? — this one keeps coming back.</span>' : ""}</li>`)
+    .join("");
   screen().innerHTML = `<div class="card debrief">
     <div class="phase-label">Phase D — debrief</div>
     <div class="prompt">Session done. <span class="xp-pop">+${d.xp} XP</span></div>

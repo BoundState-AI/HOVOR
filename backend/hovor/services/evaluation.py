@@ -86,6 +86,22 @@ def evaluate_production(response: str, lexeme: Lexeme) -> EvaluationResult:
         )
         return result
 
+    # Right words, wrong order → communicated, but the structure target is
+    # missed (English speakers scramble clitic position, spec §12).
+    bare_tokens = sorted(strip_diacritics(norm).split())
+    for v in variants:
+        if len(v.split()) > 1 and bare_tokens == sorted(strip_diacritics(v).split()):
+            result.semantic_success = True
+            result.target_structure_success = False
+            result.errors.append(
+                ErrorTag(
+                    tag=f"word_order:{lexeme.id}",
+                    category=CATEGORY_GRAMMAR_TARGET,
+                    detail=f"Said '{response}' — right words, expected order '{lexeme.slovak}'.",
+                )
+            )
+            return result
+
     # Shared stem, wrong ending → likely morphology, not lexical failure.
     for v in variants:
         stem = v[: max(3, len(v) - 3)]
@@ -178,6 +194,26 @@ def evaluate_contrast(response: str, target: Lexeme, partner: Lexeme) -> Evaluat
             )
         ]
     return result
+
+
+def known_error_tags(response: str, repair_items: dict[str, dict[str, Any]], skip_item: str | None = None) -> list[ErrorTag]:
+    """Match the response against the library of known learner mistakes
+    (repair_items encode them, natively reviewable). A hit means we can say
+    exactly WHY it's wrong, not just that it is (spec §12)."""
+    bare = strip_diacritics(normalize(response))
+    tags: list[ErrorTag] = []
+    for item in repair_items.values():
+        if item["id"] == skip_item:
+            continue
+        if bare == strip_diacritics(normalize(item["broken"])):
+            tags.append(
+                ErrorTag(
+                    tag=f"known_error:{item['id']}",
+                    category=CATEGORY_GRAMMAR_TARGET,
+                    detail=item.get("explanation", ""),
+                )
+            )
+    return tags
 
 
 def word_disagreement(a: str, b: str) -> float:

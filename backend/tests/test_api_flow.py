@@ -80,7 +80,11 @@ def test_full_session_loop(client):
     assert debrief["xp"] > 0
     assert len(debrief["important_errors"]) <= 2
     assert debrief["pronunciation_notes"] == []  # no fake pronunciation claims
-    assert ex_fail["item_id"] in debrief["failed_retrievals"]
+    # Failed retrievals are named by their Slovak form, not an internal id.
+    from hovor.content.loader import load_content
+
+    failed_slovak = load_content().lexemes[ex_fail["item_id"]].slovak
+    assert failed_slovak in debrief["failed_retrievals"]
 
     # Profile: recognition and production tracked separately (§34.6),
     # and the failed item is scheduled to come back (§34.7).
