@@ -36,6 +36,7 @@ uv run python -m hovor.bakeoff hovor/bakeoff/sample_manifest.json --providers mo
 | Tutor strictness → hint ladder shape (ruthless never reveals) | §11 §22 | ✅ tested |
 | Provider-neutral voice boundary + deterministic mock | §7 | ✅ tested |
 | OpenAI Realtime adapter (injectable transport; fake-transport tests) | §6.2 | ✅ live-verified (GA wire format) |
+| Two-way voice: live tutor speaks (spoken WAV per turn, "live tutor" toggle) | §6 §23.3 | ✅ live-verified; per-turn reconnect (broker = latency upgrade) |
 | Provider failure ≠ learner failure; degraded push-to-talk | §32 §34.11 | ✅ tested |
 | Dual-transcript agreement gate ("let's not score it") | §8.2 §12 | ✅ tested |
 | Build 0 bakeoff: WER/CER/diacritic/proper-noun/latency → report | §9 §33 | ✅ harness tested, ⏳ needs keys + native audio |
