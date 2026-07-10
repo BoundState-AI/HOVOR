@@ -306,12 +306,36 @@ function wireMic(input) {
     setTimeout(() => (btn.textContent = "🎤"), 2500);
   };
 
+  // Mic denial must explain itself — "blocked" with no way forward is a dead
+  // end, and on iOS the fix lives in Settings, not on this page.
+  const micHelp = (err) => {
+    fail("🎤 blocked");
+    if ($("#michelp")) return;
+    const inApp = /FBAN|FBAV|Instagram|Twitter|GSA|Line|Snapchat/i.test(navigator.userAgent);
+    let how;
+    if (inApp) {
+      how = "You're in another app's built-in browser, which never allows the mic. Open this page in Safari or Chrome directly.";
+    } else if (err && err.name === "NotFoundError") {
+      how = "No microphone was found on this device.";
+    } else if (/iPhone|iPad/.test(navigator.userAgent)) {
+      how = "Allow the mic for this site: tap <b>ᴀA</b> in the address bar → Website Settings → Microphone → Allow. " +
+            "If there's no Microphone entry, check Settings → Apps → Safari → Microphone. " +
+            "If you opened this link from another app, open it in Safari itself.";
+    } else {
+      how = "Allow microphone access for this site in your browser's site settings (usually the icon left of the address bar), then try again.";
+    }
+    btn.closest(".card").insertAdjacentHTML(
+      "beforeend",
+      `<div class="feedback note" id="michelp">🎤 ${how} <i>(You can always type instead.)</i></div>`
+    );
+  };
+
   const start = async () => {
     let stream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch {
-      return fail("🎤 blocked");
+    } catch (err) {
+      return micHelp(err);
     }
     const chunks = [];
     recorder = new MediaRecorder(stream);
