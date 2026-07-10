@@ -34,7 +34,7 @@ async function refreshSidebar() {
     api("GET", `/users/${user.id}/map`),
     api("GET", `/users/${user.id}/streak`),
     api("GET", `/users/${user.id}/achievements`),
-    fetch("/health").then((r) => r.json()),
+    fetch(ROOT + "/health").then((r) => r.json()),
   ]);
   $("#user-box").innerHTML = `<b>${user.name}</b>`;
   $("#stats").innerHTML =
