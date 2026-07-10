@@ -96,6 +96,9 @@ async function startSession() {
     session.queue.push({ kind: "introduce", phase: "B — new material", item: item.introduce });
     session.queue.push({ kind: "exercise", phase: "B — say it back", ex: item.exercise });
   }
+  for (const ex of session.plan.phase_b_recall || []) {
+    session.queue.push({ kind: "exercise", phase: "B — pamätáš si? (recall)", ex });
+  }
   session.queue.push({ kind: "mission", phase: "C — voice mission" });
   nextStep();
 }
@@ -141,7 +144,6 @@ function showExercise(step) {
     $("#pmask").style.display = "none";
   } : null);
   if (isListening && say) say();
-  wireMic($("#answer"));
   const submit = async () => {
     const response = $("#answer").value.trim();
     if (!response) return;
@@ -177,6 +179,7 @@ function showExercise(step) {
   };
   $("#submit").onclick = submit;
   $("#answer").onkeydown = (e) => e.key === "Enter" && submit();
+  wireMic($("#answer"), submit); // release-to-send
   $("#answer").focus();
 }
 
@@ -195,9 +198,17 @@ function speakBtn(id) {
 function wireSpeak(id, text, onFail) {
   const btn = $(`#${id}`);
   if (!btn) return;
+  let current = null; // single-flight: first play synthesizes (~2s), and an
+                      // impatient second tap must not stack an echo on it
   const say = () => {
+    if (current) { current.pause(); current = null; }
     const audio = new Audio(`${API}/tts?text=${encodeURIComponent(text)}`);
+    current = audio;
+    btn.classList.add("loading");
+    audio.onplaying = () => btn.classList.remove("loading");
+    audio.onended = () => { if (current === audio) current = null; };
     audio.play().catch(() => {
+      btn.classList.remove("loading");
       btn.style.opacity = 0.25;
       btn.disabled = true;
       if (onFail) onFail();
@@ -231,7 +242,6 @@ async function startMission() {
     addMsg("hint", "⚠ live tutor unavailable right now — running the scripted tutor instead.");
   }
   updateObjectives(voice.objective_state);
-  wireMic($("#say"));
   const send = async () => {
     const text = $("#say").value.trim();
     if (!text) return;
@@ -254,6 +264,7 @@ async function startMission() {
   };
   $("#send").onclick = send;
   $("#say").onkeydown = (e) => e.key === "Enter" && send();
+  wireMic($("#say"), send); // release-to-send
   $("#say").focus();
 }
 
@@ -295,17 +306,20 @@ async function showDebrief() {
 
 function micButton() {
   const supported = !!(navigator.mediaDevices && window.MediaRecorder);
-  return supported ? `<button class="mic" id="mic" title="Tap, speak Slovak, tap again">🎤</button>` : "";
+  return supported ? `<button class="mic" id="mic" title="Podrž a hovor — hold to talk, release to send">🎤</button>` : "";
 }
 
-/* Push-to-talk: record in the browser (works everywhere, including iOS),
-   transcribe server-side in Slovak. Tap to start, tap to stop; errors are
-   shown on the button — never a silent no-op. */
-function wireMic(input) {
+/* Push-to-talk, walkie-talkie style: hold the mic, speak, release — the
+   transcript submits itself (onTranscript). One gesture instead of
+   tap-stop-tap-answer. Errors are shown on the button — never a silent
+   no-op. Typing always remains available. */
+function wireMic(input, onTranscript) {
   const btn = $("#mic");
   if (!btn) return;
   let recorder = null;
   let autoStop = null;
+  let held = false;
+  let startedAt = 0;
 
   const fail = (label) => {
     btn.classList.remove("listening", "busy");
@@ -338,6 +352,7 @@ function wireMic(input) {
   };
 
   const start = async () => {
+    if (recorder) return;
     let stream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -351,12 +366,19 @@ function wireMic(input) {
       clearTimeout(autoStop);
       stream.getTracks().forEach((t) => t.stop());
       btn.classList.remove("listening");
+      const heldMs = Date.now() - startedAt;
+      const mime = (recorder && recorder.mimeType) || "audio/webm";
+      recorder = null;
+      if (heldMs < 350) {
+        // An accidental tap, not speech — teach the gesture.
+        return fail("podrž 🎤");
+      }
       btn.classList.add("busy");
       btn.textContent = "…";
       try {
-        const blob = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+        const blob = new Blob(chunks, { type: mime });
         const fd = new FormData();
-        fd.append("audio", blob, "speech." + ((recorder.mimeType || "webm").includes("mp4") ? "mp4" : "webm"));
+        fd.append("audio", blob, "speech." + (mime.includes("mp4") ? "mp4" : "webm"));
         const res = await fetch(`${API}/transcribe`, { method: "POST", body: fd });
         if (!res.ok) throw new Error(res.status);
         const out = await res.json();
@@ -365,22 +387,35 @@ function wireMic(input) {
         if (!out.text) return fail("🎤 nič?");
         input.value = out.text;
         window._lastInputWasSpeech = true;
-        input.focus();
+        // Release = said it. Submit like a spoken turn, no extra tap.
+        if (onTranscript) onTranscript();
+        else input.focus();
       } catch {
         fail("🎤 offline");
       }
-      recorder = null;
     };
     recorder.start();
+    startedAt = Date.now();
     btn.classList.add("listening");
-    btn.textContent = "⏹";
+    btn.textContent = "🔴";
     autoStop = setTimeout(() => recorder && recorder.state === "recording" && recorder.stop(), 15000);
+    if (!held) recorder.stop(); // released before the mic warmed up
   };
 
-  btn.onclick = () => {
+  const stop = () => {
+    held = false;
     if (recorder && recorder.state === "recording") recorder.stop();
-    else if (!btn.classList.contains("busy")) start();
   };
+
+  btn.onpointerdown = (e) => {
+    e.preventDefault();
+    if (btn.classList.contains("busy")) return;
+    try { btn.setPointerCapture(e.pointerId); } catch {}
+    held = true;
+    start();
+  };
+  btn.onpointerup = btn.onpointercancel = stop;
+  btn.oncontextmenu = (e) => e.preventDefault(); // iOS long-press menu
 }
 
 /* ---------- boot ---------- */

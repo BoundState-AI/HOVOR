@@ -50,8 +50,9 @@ input[type=text]:focus { outline: 2px solid var(--gold); border-color: var(--gol
 .msg.learner .gloss { color: var(--side-dim); }
 .msg.hint { background: rgba(212, 160, 23, .1); border: 1px dashed var(--gold); color: var(--note); align-self: flex-start; font-size: 14px; }
 .objectives { font-size: 13px; color: var(--dim); margin: 8px 0; }
-.mic { background: var(--card); border: 1px solid var(--border); color: var(--ink); border-radius: 12px; padding: 11px 15px; cursor: pointer; }
-.mic.listening { background: var(--bad); border-color: var(--bad); color: #fff; }
+.mic { background: var(--card); border: 1px solid var(--border); color: var(--ink); border-radius: 12px; padding: 11px 15px; cursor: pointer;
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.mic.listening { background: var(--bad); border-color: var(--bad); color: #fff; transform: scale(1.06); }
 .mic.busy { opacity: .6; }
 .review-flag { font-size: 11px; color: var(--gold-2); margin-top: 20px; }
 .debrief h3 { margin: 12px 0 6px; font-family: Georgia, serif; color: var(--green); }
@@ -61,6 +62,8 @@ input[type=text]:focus { outline: 2px solid var(--gold); border-color: var(--gol
 #sidebar .small { color: var(--side-dim); }
 .spk { background: transparent; border: 0; padding: 0 4px; font-size: 20px; cursor: pointer; vertical-align: middle; }
 .spk:hover { transform: scale(1.15); }
+.spk.loading { animation: spk-pulse 1s ease-in-out infinite; }
+@keyframes spk-pulse { 50% { opacity: .35; } }
 
 /* ---------- mobile ---------- */
 @media (max-width: 820px) {

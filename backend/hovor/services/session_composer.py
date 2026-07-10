@@ -162,6 +162,19 @@ def compose_session(db: Session, user_id: int, content: ContentBundle) -> Learni
             }
         )
 
+    # Batch recall: echoing a word right after its introduction is not
+    # retrieval (spec §13). Once the whole batch is in, every new word gets
+    # tested again at a distance — in introduction order, so the first word
+    # learned carries the longest gap.
+    phase_b_recall = (
+        [
+            _exercise_for(entry["introduce"]["item_id"], "production_prompted", content)
+            for entry in phase_b
+        ]
+        if len(phase_b) >= 3
+        else []
+    )
+
     # Phase C — the campaign decides: first uncompleted mission in the first
     # unlocked region (spec §4: map is a layer over the curriculum graph).
     mission_id = game.next_mission(db, user_id, content)
@@ -175,7 +188,12 @@ def compose_session(db: Session, user_id: int, content: ContentBundle) -> Learni
 
     session = LearningSession(
         user_id=user_id,
-        plan={"phase_a": phase_a, "phase_b": phase_b, "phase_c": phase_c},
+        plan={
+            "phase_a": phase_a,
+            "phase_b": phase_b,
+            "phase_b_recall": phase_b_recall,
+            "phase_c": phase_c,
+        },
         content_version=content.content_version,
     )
     db.add(session)
