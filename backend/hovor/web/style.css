@@ -1,63 +1,76 @@
+/* HOVOR! — green/gold Slovak identity: deep emerald sidebar, warm paper
+   canvas, gold action color, serif display type. */
 * { box-sizing: border-box; margin: 0; }
 :root {
-  --bg: #101418; --panel: #1a2129; --panel2: #212a34; --text: #e8edf2;
-  --dim: #93a1b0; --accent: #4fb0ff; --ok: #4cc38a; --bad: #e5484d;
-  --gold: #f0b429; --border: #2c3947;
+  --green: #0a3d2e; --green-2: #10503c; --green-3: #0e4736;
+  --gold: #d4a017; --gold-2: #e3b23c;
+  --paper: #f8f5f0; --card: #ffffff; --border: #e5dfd3;
+  --ink: #22312a; --dim: #6f7d74;
+  --ok: #2c8a5f; --bad: #c4373d; --note: #9a7208;
+  --side-text: #eaf4ee; --side-dim: #9fc4ae;
 }
-body { background: var(--bg); color: var(--text); font: 16px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; }
+body { background: var(--paper); color: var(--ink); font: 16px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif; }
 #app { display: flex; min-height: 100vh; }
-#sidebar { width: 300px; padding: 20px; background: var(--panel); border-right: 1px solid var(--border); flex-shrink: 0; }
-#sidebar h1 { font-size: 28px; letter-spacing: 2px; color: var(--accent); }
-.tagline { color: var(--dim); font-size: 13px; margin-bottom: 16px; }
-#sidebar h2 { font-size: 13px; text-transform: uppercase; color: var(--dim); margin: 18px 0 8px; }
+#sidebar { width: 300px; padding: 22px 20px; background: var(--green); color: var(--side-text); flex-shrink: 0; }
+#sidebar h1 { font: 700 30px/1.1 Georgia, "Iowan Old Style", "Times New Roman", serif; letter-spacing: 1px; color: #fff; }
+#sidebar h1::before { content: "🗣️"; display: inline-block; background: var(--gold); border-radius: 10px; padding: 3px 6px; font-size: 18px; margin-right: 8px; vertical-align: 4px; }
+.tagline { color: var(--side-dim); font-size: 13px; margin: 6px 0 16px; }
+#sidebar h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--side-dim); margin: 20px 0 8px; }
+#sidebar label { color: var(--side-dim); }
 #main { flex: 1; padding: 32px; max-width: 780px; }
-button { background: var(--accent); color: #08111a; border: 0; border-radius: 8px; padding: 10px 18px; font-size: 15px; font-weight: 600; cursor: pointer; }
-button.secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
+button { background: var(--gold); color: var(--green); border: 0; border-radius: 12px; padding: 11px 20px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s, transform .05s; }
+button:hover { background: var(--gold-2); }
+button:active { transform: scale(.985); }
+button.secondary { background: transparent; color: var(--ink); border: 1px solid var(--border); }
 button:disabled { opacity: .4; cursor: default; }
-input[type=text] { background: var(--panel2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 16px; width: 100%; }
-.card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 16px; }
-.phase-label { font-size: 12px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
-.prompt { font-size: 26px; margin: 10px 0 4px; }
+input[type=text] { background: var(--card); border: 1px solid var(--border); color: var(--ink); border-radius: 12px; padding: 11px 14px; font-size: 16px; width: 100%; }
+input[type=text]:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(34, 49, 42, .06); }
+.phase-label { font-size: 12px; text-transform: uppercase; color: var(--note); letter-spacing: 1.5px; font-weight: 600; }
+.prompt { font: 600 28px/1.25 Georgia, "Iowan Old Style", "Times New Roman", serif; margin: 10px 0 4px; color: var(--green); }
 .instruction { color: var(--dim); margin-bottom: 14px; }
 .row { display: flex; gap: 10px; margin-top: 10px; }
-.feedback { margin-top: 12px; padding: 10px 14px; border-radius: 8px; }
-.feedback.ok { background: rgba(76,195,138,.12); color: var(--ok); }
-.feedback.bad { background: rgba(229,72,77,.12); color: var(--bad); }
-.feedback.note { background: rgba(240,180,41,.12); color: var(--gold); }
-.region { padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; background: var(--panel2); font-size: 14px; }
+.feedback { margin-top: 12px; padding: 10px 14px; border-radius: 10px; }
+.feedback.ok { background: rgba(44, 138, 95, .1); color: var(--ok); }
+.feedback.bad { background: rgba(196, 55, 61, .09); color: var(--bad); }
+.feedback.note { background: rgba(212, 160, 23, .12); color: var(--note); }
+.region { padding: 9px 11px; border-radius: 10px; margin-bottom: 6px; background: var(--green-2); font-size: 14px; color: var(--side-text); }
 .region.locked { opacity: .45; }
-.region .missions { font-size: 12px; color: var(--dim); }
-.region .done { color: var(--ok); }
-.badge { display: inline-block; background: var(--panel2); border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 2px 10px; font-size: 12px; margin: 2px 4px 2px 0; }
-#stats { font-size: 14px; color: var(--dim); }
-#stats b { color: var(--text); }
+.region .missions { font-size: 12px; color: var(--side-dim); }
+.region .done { color: var(--gold-2); }
+.badge { display: inline-block; background: transparent; border: 1px solid var(--gold); color: var(--gold-2); border-radius: 999px; padding: 2px 10px; font-size: 12px; margin: 2px 4px 2px 0; }
+#stats { font-size: 14px; color: var(--side-dim); }
+#stats b { color: #fff; }
+#user-box b { color: #fff; }
 .chat { display: flex; flex-direction: column; gap: 10px; max-height: 420px; overflow-y: auto; padding: 4px; }
-.msg { max-width: 82%; padding: 10px 14px; border-radius: 12px; }
-.msg.tutor { background: var(--panel2); align-self: flex-start; }
-.msg.learner { background: #14406b; align-self: flex-end; }
+.msg { max-width: 82%; padding: 10px 14px; border-radius: 14px; }
+.msg.tutor { background: var(--paper); border: 1px solid var(--border); align-self: flex-start; }
+.msg.learner { background: var(--green); color: var(--side-text); align-self: flex-end; }
 .msg .gloss { display: block; font-size: 12px; color: var(--dim); margin-top: 4px; }
-.msg.hint { background: rgba(240,180,41,.1); border: 1px dashed var(--gold); align-self: flex-start; font-size: 14px; }
+.msg.learner .gloss { color: var(--side-dim); }
+.msg.hint { background: rgba(212, 160, 23, .1); border: 1px dashed var(--gold); color: var(--note); align-self: flex-start; font-size: 14px; }
 .objectives { font-size: 13px; color: var(--dim); margin: 8px 0; }
-.mic { background: var(--panel2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 14px; cursor: pointer; }
-.mic.listening { background: var(--bad); color: white; }
-.review-flag { font-size: 11px; color: var(--gold); margin-top: 20px; }
-.debrief h3 { margin: 12px 0 6px; }
+.mic { background: var(--card); border: 1px solid var(--border); color: var(--ink); border-radius: 12px; padding: 11px 15px; cursor: pointer; }
+.mic.listening { background: var(--bad); border-color: var(--bad); color: #fff; }
+.mic.busy { opacity: .6; }
+.review-flag { font-size: 11px; color: var(--gold-2); margin-top: 20px; }
+.debrief h3 { margin: 12px 0 6px; font-family: Georgia, serif; color: var(--green); }
 .debrief ul { margin-left: 20px; }
-.xp-pop { color: var(--gold); font-weight: 700; }
+.xp-pop { color: var(--note); font-weight: 700; }
 .small { font-size: 13px; color: var(--dim); }
+#sidebar .small { color: var(--side-dim); }
 .spk { background: transparent; border: 0; padding: 0 4px; font-size: 20px; cursor: pointer; vertical-align: middle; }
 .spk:hover { transform: scale(1.15); }
-.mic.busy { opacity: .6; }
 
 /* ---------- mobile ---------- */
 @media (max-width: 820px) {
   #app { flex-direction: column; }
   /* Learner's work first; map, stats and achievements below it. */
   #main { order: 1; padding: 14px; max-width: 100%; }
-  #sidebar { order: 2; width: 100%; border-right: 0; border-top: 1px solid var(--border); }
-  #sidebar h1 { font-size: 22px; }
+  #sidebar { order: 2; width: 100%; }
+  #sidebar h1 { font-size: 24px; }
   .card { padding: 16px; }
-  .prompt { font-size: 22px; }
+  .prompt { font-size: 23px; }
   .row { flex-wrap: wrap; }
   .row input[type=text] { flex: 1 1 100%; }
   .row button, .row .mic { flex: 1; min-height: 46px; }

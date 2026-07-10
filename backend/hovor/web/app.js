@@ -82,7 +82,7 @@ function showHome() {
     <div class="phase-label">Daily loop</div>
     <div class="prompt">Ready?</div>
     <p class="instruction">Retrieval ambush → new material → voice mission → debrief. 10–15 minutes.</p>
-    <button id="start">Start session</button></div>`;
+    <button id="start">Začať hovoriť 🎙</button></div>`;
   $("#start").onclick = startSession;
 }
 
@@ -218,7 +218,7 @@ async function startMission() {
     <div class="objectives" id="obj"></div>
     <div class="chat" id="chat"></div>
     <div class="row"><input type="text" id="say" placeholder="Povedz niečo po slovensky..." autocomplete="off">
-    ${micButton()}<button id="send">Say it</button></div></div>`;
+    ${micButton()}<button id="send">Povedz to</button></div></div>`;
   addMsg("tutor", voice.tutor_text, voice.tutor_english);
   if (voice.provider_degraded) {
     addMsg("hint", "⚠ live tutor unavailable right now — running the scripted tutor instead.");
@@ -279,7 +279,7 @@ async function showDebrief() {
     ${errs ? `<h3>Worth fixing</h3><ul>${errs}</ul>` : ""}
     ${d.failed_retrievals.length ? `<h3>Couldn't retrieve</h3><p>${d.failed_retrievals.join(", ")} — coming back soon.</p>` : ""}
     <p class="small">${d.next_review_implication}</p>
-    <div class="row"><button id="again">Another session</button></div></div>`;
+    <div class="row"><button id="again">Ešte raz — another session</button></div></div>`;
   $("#again").onclick = startSession;
   refreshSidebar();
 }
