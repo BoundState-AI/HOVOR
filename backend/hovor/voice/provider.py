@@ -36,6 +36,9 @@ class TutorReply:
     events: list[ProviderEvent] = field(default_factory=list)
     # Tool-call proposals (spec §25): the model proposes, application validates.
     proposed_tool_calls: list[dict] = field(default_factory=list)
+    # Spoken tutor reply as a base64 WAV, when the provider produces audio.
+    # Not persisted (§31) — it rides the turn response to the client only.
+    audio_b64: str | None = None
 
 
 class VoiceProvider(ABC):

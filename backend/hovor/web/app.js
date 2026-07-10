@@ -36,7 +36,11 @@ async function refreshSidebar() {
     api("GET", `/users/${user.id}/achievements`),
     fetch(ROOT + "/health").then((r) => r.json()),
   ]);
-  $("#user-box").innerHTML = `<b>${user.name}</b>`;
+  $("#user-box").innerHTML = `<b>${user.name}</b>
+    <label class="small" title="Missions speak with the live AI tutor (needs server key; costs per turn)">
+    <input type="checkbox" id="live-tutor" ${liveTutor() ? "checked" : ""}> live tutor 🎙</label>`;
+  $("#live-tutor").onchange = (e) =>
+    localStorage.setItem("hovor_live_tutor", e.target.checked ? "1" : "0");
   $("#stats").innerHTML =
     `XP <b>${profile.total_xp}</b> · streak <b>${streak.days}</b>d` +
     (streak.shields ? ` · 🛡×${streak.shields}` : "");
@@ -153,10 +157,20 @@ function showExercise(step) {
 
 /* ---------- mission ---------- */
 
+function liveTutor() {
+  return localStorage.getItem("hovor_live_tutor") === "1";
+}
+
+function playTutorAudio(b64) {
+  if (!b64) return;
+  new Audio("data:audio/wav;base64," + b64).play().catch(() => {});
+}
+
 async function startMission() {
   const mission = session.plan.phase_c;
   voice = await api("POST", "/voice-sessions", {
     user_id: user.id, mission_id: mission.mission_id, learning_session_id: session.session_id,
+    provider_config: liveTutor() ? { provider: "openai-realtime" } : {},
   });
   screen().innerHTML = `<div class="card">
     <div class="phase-label">Phase C — ${mission.region}</div>
@@ -167,6 +181,9 @@ async function startMission() {
     <div class="row"><input type="text" id="say" placeholder="Povedz niečo po slovensky..." autocomplete="off">
     ${micButton()}<button id="send">Say it</button></div></div>`;
   addMsg("tutor", voice.tutor_text, voice.tutor_english);
+  if (voice.provider_degraded) {
+    addMsg("hint", "⚠ live tutor unavailable right now — running the scripted tutor instead.");
+  }
   updateObjectives(voice.objective_state);
   wireMic($("#say"));
   const send = async () => {
@@ -181,6 +198,7 @@ async function startMission() {
     }
     if (r.hint) addMsg("hint", `💡 ${r.hint.text}`);
     addMsg("tutor", r.tutor_text, r.tutor_english);
+    playTutorAudio(r.tutor_audio_b64);
     updateObjectives(r.objective_state);
     (r.achievements || []).forEach((a) => addMsg("hint", `🏅 ${a.title} — ${a.description}`));
     if (r.mission_complete) {

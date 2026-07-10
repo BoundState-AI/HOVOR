@@ -23,6 +23,7 @@ from hovor.services.debrief import build_debrief
 from hovor.services.session_composer import compose_session
 from hovor.voice.mock_provider import MockVoiceProvider
 from hovor.voice.orchestrator import MissionOrchestrator
+from hovor.voice.provider import ProviderError
 
 router = APIRouter(prefix="/api/v1")
 
@@ -164,17 +165,31 @@ def start_voice_session(
 ):
     if body.mission_id not in content.missions:
         raise HTTPException(status_code=404, detail="unknown mission")
-    provider = _provider_for(body.provider_config.get("provider", "mock"))
+    requested = body.provider_config.get("provider", "mock")
+    provider = _provider_for(requested)
     orchestrator = MissionOrchestrator(db, content, provider)
-    vs, opening = orchestrator.start(
-        body.user_id, body.mission_id, body.learning_session_id, body.provider_config,
-        no_english=body.no_english,
-    )
+    provider_degraded = False
+    try:
+        vs, opening = orchestrator.start(
+            body.user_id, body.mission_id, body.learning_session_id, body.provider_config,
+            no_english=body.no_english,
+        )
+    except ProviderError:
+        # Provider failure is never the learner's problem (§32): start the
+        # mission anyway on the deterministic mock and say so.
+        db.rollback()
+        orchestrator = MissionOrchestrator(db, content, _provider_for("mock"))
+        vs, opening = orchestrator.start(
+            body.user_id, body.mission_id, body.learning_session_id, {},
+            no_english=body.no_english,
+        )
+        provider_degraded = True
     db.commit()
     return {
         "voice_session_id": vs.id,
         "mission_id": vs.mission_id,
         "provider": vs.provider,
+        "provider_degraded": provider_degraded,
         "tutor_text": opening["slovak"],
         "tutor_english": opening["english"],
         "objective_state": vs.objective_state,
@@ -184,10 +199,12 @@ def start_voice_session(
 def _rebuild_orchestrator(
     vs: VoiceSession, db: Session, content: ContentBundle, provider_config: dict | None = None
 ) -> MissionOrchestrator:
-    # Stateless HTTP slice: recreate the provider per request and replay its
-    # config. A real deployment holds a live provider connection per session
-    # in the Voice Session Broker (spec §23.3).
-    provider = _provider_for("mock")
+    # Stateless HTTP slice: recreate the session's OWN provider per request
+    # and replay its config. Per-turn reconnect costs latency; a future Voice
+    # Session Broker (spec §23.3) holds one live connection per session.
+    # Degraded sessions continue on the mock — the mission goes on (§32).
+    name = vs.provider if vs.state == "active" else "mock"
+    provider = _provider_for(name or "mock")
     provider.create_session(provider_config or {})
     return MissionOrchestrator(db, content, provider)
 
@@ -205,7 +222,20 @@ def voice_turn(
     if vs.state not in ("active", "degraded_push_to_talk", "degraded_text"):
         raise HTTPException(status_code=409, detail=f"session is {vs.state}")
     config = {"fail_on_turn": 1} if body.simulate_provider_failure else {}
-    orchestrator = _rebuild_orchestrator(vs, db, content, config)
+    try:
+        orchestrator = _rebuild_orchestrator(vs, db, content, config)
+    except ProviderError:
+        # Reconnect failed (key gone, network, provider down): degrade the
+        # channel, preserve mission state, score nothing (§32, §34.11).
+        vs.state = "degraded_push_to_talk"
+        db.commit()
+        return {
+            "provider_failure": True,
+            "fallback": "push_to_talk",
+            "mission_state_preserved": True,
+            "objective_state": vs.objective_state,
+            "tutor_text": None,
+        }
     result = orchestrator.handle_learner_turn(vs, body.text)
     db.commit()
     return result

@@ -159,6 +159,9 @@ class MissionOrchestrator:
             "provider_failure": False,
             "tutor_text": reply.text,
             "tutor_english": reply.english_gloss,
+            # Spoken reply (base64 WAV) when the provider produced audio.
+            # Response-only: audio is never written to the conversation log (§31).
+            "tutor_audio_b64": reply.audio_b64,
             "objectives_completed_this_turn": just_completed,
             "hint": hint,
             "objective_state": vs.objective_state,

@@ -56,6 +56,34 @@ def test_turn_roundtrip_assembles_reply():
     assert {e.type for e in reply.events} >= {"final_transcript", "response_started", "response_completed"}
 
 
+def test_audio_deltas_assemble_into_playable_wav():
+    """Two-way voice: audio deltas from the model come back as one base64
+    WAV on the reply (client plays it), alongside the text transcript."""
+    import base64
+
+    pcm = b"\x00\x01" * 1200  # 0.05s of fake PCM16 @ 24kHz
+    half = len(pcm) // 2
+    script = [
+        {"type": "response.created"},
+        {"type": "response.output_audio_transcript.delta", "delta": "Dobrý deň."},
+        {"type": "response.output_audio.delta", "delta": base64.b64encode(pcm[:half]).decode()},
+        {"type": "response.output_audio.delta", "delta": base64.b64encode(pcm[half:]).decode()},
+        {"type": "response.done"},
+    ]
+    provider, _ = _provider_with(script)
+    reply = provider.send_text("Dobrý deň", {"mission": {}, "pending_objective": None})
+    assert reply.text == "Dobrý deň."
+    wav = base64.b64decode(reply.audio_b64)
+    assert wav[:4] == b"RIFF" and wav[8:12] == b"WAVE"
+    assert pcm in wav  # payload survives intact
+
+
+def test_text_only_reply_has_no_audio():
+    provider, _ = _provider_with(TURN_SCRIPT)
+    reply = provider.send_text("Dobrý deň", {"mission": {}, "pending_objective": None})
+    assert reply.audio_b64 is None
+
+
 def test_error_event_raises_provider_error():
     provider, _ = _provider_with([{"type": "error", "error": {"message": "rate limited"}}])
     with pytest.raises(ProviderError):

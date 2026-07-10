@@ -10,14 +10,28 @@ The adapter receives bounded per-turn context from the orchestrator and
 returns proposals. It owns no persistent truth (spec §24, §25).
 """
 
+import base64
+import io
 import json
 import os
+import wave
 from typing import Any, Protocol
 
 from hovor.voice.provider import ProviderError, ProviderEvent, TutorReply, VoiceProvider
 
 REALTIME_URL = "wss://api.openai.com/v1/realtime"
 DEFAULT_MODEL = "gpt-realtime"
+AUDIO_SAMPLE_RATE = 24_000  # GA realtime output: PCM16 mono @ 24 kHz
+
+
+def _pcm16_to_wav_b64(pcm: bytes, sample_rate: int = AUDIO_SAMPLE_RATE) -> str:
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as wav:
+        wav.setnchannels(1)
+        wav.setsampwidth(2)
+        wav.setframerate(sample_rate)
+        wav.writeframes(pcm)
+    return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
 class Transport(Protocol):
@@ -159,6 +173,7 @@ class OpenAIRealtimeProvider(VoiceProvider):
     def _collect_response(self, learner_text: str) -> TutorReply:
         events: list[ProviderEvent] = [ProviderEvent("final_transcript", {"text": learner_text})]
         text_parts: list[str] = []
+        audio_parts: list[bytes] = []
         tool_calls: list[dict] = []
         while True:
             event = self._transport.recv()
@@ -170,7 +185,12 @@ class OpenAIRealtimeProvider(VoiceProvider):
             elif etype == "response.output_audio_transcript.delta":
                 text_parts.append(event.get("delta", ""))
             elif etype == "response.output_audio.delta":
-                events.append(ProviderEvent("audio_delta", {"size": len(event.get("delta", ""))}))
+                delta = event.get("delta", "")
+                events.append(ProviderEvent("audio_delta", {"size": len(delta)}))
+                try:
+                    audio_parts.append(base64.b64decode(delta))
+                except (ValueError, TypeError):
+                    pass  # malformed delta degrades to text-only, never a crash
             elif etype == "response.function_call_arguments.done":
                 try:
                     args = json.loads(event.get("arguments", "{}"))
@@ -182,11 +202,13 @@ class OpenAIRealtimeProvider(VoiceProvider):
                 break
             elif etype == "error":
                 raise ProviderError(f"realtime error: {event.get('error', event)}")
+        pcm = b"".join(audio_parts)
         return TutorReply(
             text="".join(text_parts).strip(),
             english_gloss=None,  # a real model speaks Slovak; gloss is a client concern
             events=events,
             proposed_tool_calls=tool_calls,
+            audio_b64=_pcm16_to_wav_b64(pcm) if pcm else None,
         )
 
     def interrupt(self) -> ProviderEvent:
