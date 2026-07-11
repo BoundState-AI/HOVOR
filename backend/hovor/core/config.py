@@ -1,3 +1,7 @@
+"""Settings (pydantic-settings, HOVOR_ env prefix) + session-composition and
+XP knobs (spec §5, §16.1). backend/.env deliberately overrides inherited
+shell env — see the load_dotenv comment."""
+
 from pathlib import Path
 
 from dotenv import load_dotenv

@@ -1,3 +1,8 @@
+"""Learner-state ORM: users, per-(item, mode) mastery estimates, attempts,
+error observations, learning sessions (spec §13, §29). Content is NOT here —
+it lives in versioned JSON (hovor.content) and is referenced by id +
+content_version so attempts can be re-scored after content revisions."""
+
 from datetime import datetime, timezone
 
 from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text

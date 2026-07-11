@@ -1,3 +1,7 @@
+"""SQLAlchemy engine, session factory, declarative Base, and init_db().
+SQLite by default (single learner); HOVOR_DATABASE_URL points it elsewhere
+(Railway mounts /data)."""
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 

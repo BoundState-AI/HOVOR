@@ -1,3 +1,7 @@
+"""Voice-mission ORM: live session state, objective progress, hint ladders,
+turn transcripts (spec §24). The application owns mission state — never the
+voice provider (spec §6.3, §25)."""
+
 from datetime import datetime
 
 from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text

@@ -1,3 +1,7 @@
+"""HTTP API: users/settings/privacy, session composition, exercise attempts,
+voice missions (live + mock), hear-it TTS, speech transcription, and
+/health + /metrics. Thin layer — scoring and scheduling live in services/."""
+
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session

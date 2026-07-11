@@ -1,3 +1,7 @@
+"""API request/response schemas (Pydantic). Wire contracts only — learner
+state lives in hovor.models; these shapes are shared with the iOS HovorKit
+contracts and must stay in sync."""
+
 from pydantic import BaseModel, Field
 
 

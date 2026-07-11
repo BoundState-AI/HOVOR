@@ -1,3 +1,6 @@
+"""Shared fixtures: in-memory SQLite session, loaded content bundle, and a
+TestClient wired to both — no real database file, no network."""
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine

@@ -1,3 +1,10 @@
+"""FastAPI app factory: API router + static web client mount.
+
+Handles the reverse-proxy base path (boundstate.ai/hovor → Railway) via
+per-request root_path middleware — see the comment on apply_base_path for
+why rewriting the path would break bare-path health checks.
+"""
+
 import os
 from pathlib import Path
 
