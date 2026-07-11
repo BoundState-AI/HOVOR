@@ -340,7 +340,7 @@ async function showDebrief() {
 
 function micButton() {
   const supported = !!(navigator.mediaDevices && window.MediaRecorder);
-  return supported ? `<button class="mic" id="mic" title="Podrž a hovor — hold to talk, release to send">🎤</button>` : "";
+  return supported ? `<button class="mic" id="mic" title="Podrž a hovor (release sends) — or tap to start, tap again to send">🎤</button>` : "";
 }
 
 /* Push-to-talk, walkie-talkie style: hold the mic, speak, release — the
@@ -400,13 +400,8 @@ function wireMic(input, onTranscript) {
       clearTimeout(autoStop);
       stream.getTracks().forEach((t) => t.stop());
       btn.classList.remove("listening");
-      const heldMs = Date.now() - startedAt;
       const mime = (recorder && recorder.mimeType) || "audio/webm";
       recorder = null;
-      if (heldMs < 350) {
-        // An accidental tap, not speech — teach the gesture.
-        return fail("podrž 🎤");
-      }
       btn.classList.add("busy");
       btn.textContent = "…";
       try {
@@ -433,22 +428,38 @@ function wireMic(input, onTranscript) {
     btn.classList.add("listening");
     btn.textContent = "🔴";
     autoStop = setTimeout(() => recorder && recorder.state === "recording" && recorder.stop(), 15000);
-    if (!held) recorder.stop(); // released before the mic warmed up
+    // If the finger already lifted (e.g. iOS held the mic-permission sheet
+    // open), DON'T discard — continue in tap-toggle mode; next tap sends.
+    if (!held) btn.textContent = "🔴 ⏹";
   };
 
-  const stop = () => {
+  const finish = () => {
     held = false;
     if (recorder && recorder.state === "recording") recorder.stop();
   };
 
+  // Dual-mode: hold-and-release sends (walkie-talkie); a short tap starts
+  // recording and a second tap sends. Pointer cancels (iOS long-press
+  // handling) fall through to tap mode — recorded speech is never dropped.
   btn.onpointerdown = (e) => {
     e.preventDefault();
     if (btn.classList.contains("busy")) return;
     try { btn.setPointerCapture(e.pointerId); } catch {}
+    if (recorder && recorder.state === "recording") return finish(); // tap 2: send
     held = true;
+    startedAt = Date.now();
     start();
   };
-  btn.onpointerup = btn.onpointercancel = stop;
+  btn.onpointerup = (e) => {
+    e.preventDefault();
+    if (!recorder || recorder.state !== "recording") { held = false; return; }
+    if (Date.now() - startedAt >= 450) finish();          // held → release sends
+    else { held = false; btn.textContent = "🔴 ⏹"; }      // tap → keep recording
+  };
+  btn.onpointercancel = () => {
+    held = false;
+    if (recorder && recorder.state === "recording") btn.textContent = "🔴 ⏹";
+  };
   btn.oncontextmenu = (e) => e.preventDefault(); // iOS long-press menu
 }
 
