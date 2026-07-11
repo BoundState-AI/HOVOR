@@ -96,8 +96,16 @@ async function startSession() {
     session.queue.push({ kind: "introduce", phase: "B — new material", item: item.introduce });
     session.queue.push({ kind: "exercise", phase: "B — say it back", ex: item.exercise });
   }
-  for (const ex of session.plan.phase_b_recall || []) {
-    session.queue.push({ kind: "exercise", phase: "B — pamätáš si? (recall)", ex });
+  const recall = session.plan.phase_b_recall || [];
+  if (recall.length) {
+    // The recall check announces itself — retrieval works best when the
+    // learner knows it's a test — and reports the score at the end.
+    session.recall = { total: recall.length, hits: 0 };
+    session.queue.push({ kind: "recall_intro", count: recall.length });
+    for (const ex of recall) {
+      session.queue.push({ kind: "exercise", phase: "B — pamätáš si? (recall)", ex, recall: true });
+    }
+    session.queue.push({ kind: "recall_summary" });
   }
   session.queue.push({ kind: "mission", phase: "C — voice mission" });
   nextStep();
@@ -108,7 +116,31 @@ function nextStep() {
   if (!step) return showDebrief();
   if (step.kind === "introduce") return showIntroduce(step);
   if (step.kind === "exercise") return showExercise(step);
+  if (step.kind === "recall_intro") return showRecallIntro(step);
+  if (step.kind === "recall_summary") return showRecallSummary();
   if (step.kind === "mission") return startMission();
+}
+
+function showRecallIntro(step) {
+  screen().innerHTML = `<div class="card">
+    <div class="phase-label">Phase B — pamätáš si?</div>
+    <div class="prompt">Let's see how much you recall.</div>
+    <p class="instruction">You just met <b>${step.count} new words</b>. Say each one back — no peeking. Misses aren't failures; they tell the scheduler what to bring back sooner.</p>
+    <button id="next">Poďme!</button></div>`;
+  $("#next").onclick = nextStep;
+}
+
+function showRecallSummary() {
+  const r = session.recall || { total: 0, hits: 0 };
+  const all = r.hits === r.total;
+  screen().innerHTML = `<div class="card">
+    <div class="phase-label">Phase B — výsledok</div>
+    <div class="prompt">Recalled ${r.hits} of ${r.total} ${all ? "🎉" : ""}</div>
+    <p class="instruction">${all
+      ? "Every new word came back on demand — they're scheduled out further now."
+      : "The missed ones return sooner — right at the edge of forgetting, where it sticks."}</p>
+    <button id="next">Na misiu →</button></div>`;
+  $("#next").onclick = nextStep;
 }
 
 function showIntroduce(step) {
@@ -159,6 +191,7 @@ function showExercise(step) {
       $("#ptext").style.display = "";
       $("#pmask").style.display = "none";
     }
+    if (step.recall && session.recall && out.semantic_success) session.recall.hits++;
     let cls = out.semantic_success ? "ok" : "bad";
     let msg = out.semantic_success ? "✓ Correct" : "✗ Not quite";
     // A miss shows the corrected form (spec §12) — never a raw error tag.
