@@ -440,7 +440,7 @@
             "english": "Are you really John's grandson from America?"
           },
           "ack": {
-            "slovak": "Ja to vedela! Celý dedko!",
+            "slovak": "Ja som to vedela! Celý dedko!",
             "english": "I knew it! Just like your grandpa!"
           },
           "hints": [
@@ -958,7 +958,7 @@
             "english": "Unfortunately we don't have that record here."
           },
           "ack": {
-            "slovak": "Staršia matrika pre Pílu je v štátnom archíve v Modre. Choďte tam a pýtajte si rodnú matriku, rok 1898.",
+            "slovak": "Staršia matrika pre Pílu je v štátnom archíve v Modre. Choďte tam a pýtajte si matriku narodených, rok 1898.",
             "english": "The older registry for Píla is in the state archive in Modra. Go there and ask for the birth registry, year 1898."
           },
           "hints": [
