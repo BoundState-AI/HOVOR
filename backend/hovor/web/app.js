@@ -82,8 +82,14 @@ function showHome() {
     <div class="phase-label">Daily loop</div>
     <div class="prompt">Ready?</div>
     <p class="instruction">Retrieval ambush → new material → voice mission → debrief. 10–15 minutes.</p>
-    <button id="start">Začať hovoriť 🎙</button></div>`;
+    <div class="row">
+      <button id="start">Začať hovoriť 🎙</button>
+      <button id="primer" class="secondary">Day 0: Alphabet &amp; Diacritics</button>
+    </div>
+    <p class="small">First time? Start with the primer — learn to see and hear the 46 letters.</p>
+  </div>`;
   $("#start").onclick = startSession;
+  $("#primer").onclick = showAlphabetPrimer;
 }
 
 /* ---------- session flow ---------- */
@@ -461,6 +467,114 @@ function wireMic(input, onTranscript) {
     if (recorder && recorder.state === "recording") btn.textContent = "🔴 ⏹";
   };
   btn.oncontextmenu = (e) => e.preventDefault(); // iOS long-press menu
+}
+
+/* ---------- alphabet & diacritics primer (day-zero, no scoring) ---------- */
+
+async function showAlphabetPrimer() {
+  const data = await api("GET", "/alphabet");
+  const letters = data.letters || [];
+  const contrasts = data.contrast_pairs || [];
+  const speakPairs = []; // [id, text] collected while building the HTML
+
+  let html = `<div class="card">
+    <div class="phase-label">Day Zero</div>
+    <div class="prompt">Slovak Alphabet &amp; Diacritics</div>
+    <p class="instruction">${data.intro || ""}</p>
+
+    <h3 class="primer-h">The Letters</h3>
+    <div class="alphabet-grid">`;
+
+  // Group letters for nicer display
+  const groups = {};
+  for (const l of letters) {
+    const g = l.group || "other";
+    (groups[g] = groups[g] || []).push(l);
+  }
+
+  for (const [gname, items] of Object.entries(groups)) {
+    html += `<div class="alpha-group"><div class="small alpha-group-label">${gname}</div>`;
+    for (const l of items) {
+      const ex = l.examples && l.examples[0] ? l.examples[0] : {slovak: l.char, gloss: ""};
+      const id = "spk-" + l.char;
+      speakPairs.push([id, l.char]);
+      html += `<div class="alpha-card">
+        <span class="alpha-letter">${l.char}</span>
+        ${speakBtn(id)}
+        <div class="small">${ex.slovak} — ${ex.gloss}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  html += `</div>`;
+
+  // Contrast pairs (real minimal pairs from the content bundle, with glosses)
+  if (contrasts.length) {
+    html += `<h3 class="primer-h">Common Contrasts (hear the difference)</h3>
+    <div class="contrast-list">`;
+    for (const cp of contrasts) {
+      const idA = "spk-a-" + cp.id, idB = "spk-b-" + cp.id;
+      speakPairs.push([idA, cp.word_a || cp.a], [idB, cp.word_b || cp.b]);
+      html += `<div class="contrast-row">
+        <span><b>${cp.a}</b> vs <b>${cp.b}</b></span>
+        ${speakBtn(idA)} <span class="small">${cp.word_a || ""} — ${cp.gloss_a || ""}</span>
+        ${speakBtn(idB)} <span class="small">${cp.word_b || ""} — ${cp.gloss_b || ""}</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Typing practice (words come from the versioned bundle, native-reviewable)
+  html += `<h3 class="primer-h">Typing Practice (no score — just get comfortable)</h3>
+    <div class="card practice-card">
+      <p class="small">Type the word exactly (include diacritics). Use the 🔊 to hear the target.</p>
+      <div id="type-practice"></div>
+    </div>`;
+  if (data.typing_tips) html += `<p class="small">${data.typing_tips}</p>`;
+  html += `<div class="row mt16">
+      <button id="back-home" class="secondary">← Back to home</button>
+    </div>
+  </div>`;
+
+  screen().innerHTML = html;
+  for (const [id, text] of speakPairs) wireSpeak(id, text);
+
+  const practiceEl = $("#type-practice");
+  if (practiceEl) {
+    const practiceWords = (data.practice_words && data.practice_words.length)
+      ? data.practice_words
+      : ["päť", "šesť", "ďakujem"];
+    let idx = 0;
+    function renderPractice() {
+      const target = practiceWords[idx % practiceWords.length];
+      practiceEl.innerHTML = `
+        <div class="practice-word">${target} ${speakBtn("spk-practice")}</div>
+        <input type="text" id="type-input" placeholder="type it here...">
+        <button id="check-type">Check</button>
+        <span id="type-result" class="small"></span>
+      `;
+      const inp = $("#type-input");
+      const res = $("#type-result");
+      const check = $("#check-type");
+      check.onclick = () => {
+        const val = (inp.value || "").trim().toLowerCase();
+        if (val === target.toLowerCase()) {
+          check.disabled = true; // Check spam must not double-advance idx
+          res.textContent = "✓ good — next";
+          res.style.color = "var(--ok)";
+          setTimeout(() => { idx++; renderPractice(); }, 700);
+        } else {
+          res.textContent = "try again (include diacritics)";
+          res.style.color = "var(--bad)";
+        }
+      };
+      wireSpeak("spk-practice", target);
+      inp.focus();
+    }
+    renderPractice();
+  }
+
+  $("#back-home").onclick = () => { refreshSidebar(); showHome(); };
 }
 
 /* ---------- boot ---------- */

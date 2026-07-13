@@ -50,6 +50,7 @@ class ContentBundle:
     # Learner-facing grammar explanations keyed by error-tag prefix (spec §12,
     # §5D) — content, not code, so the native reviewer owns the pedagogy.
     grammar_notes: dict[str, dict[str, Any]] = field(default_factory=dict)
+    alphabet: dict[str, Any] = field(default_factory=dict)
 
     def lexeme(self, lexeme_id: str) -> Lexeme:
         return self.lexemes[lexeme_id]
@@ -81,6 +82,10 @@ def load_content(content_dir: str | None = None) -> ContentBundle:
     repair_raw = _read(base / "repair_items.json")
     achievements_raw = _read(base / "achievements.json")
     grammar_raw = _read(base / "grammar_notes.json")
+    # Optional: pre-0.2.3 content snapshots have no alphabet primer, and the
+    # bundle field's default is the same empty dict.
+    alphabet_path = base / "alphabet.json"
+    alphabet_raw = _read(alphabet_path) if alphabet_path.exists() else {}
 
     lexemes = {
         item["id"]: Lexeme(
@@ -117,4 +122,5 @@ def load_content(content_dir: str | None = None) -> ContentBundle:
         repair_items={item["id"]: item for item in repair_raw["items"]},
         achievements={a["id"]: a for a in achievements_raw["achievements"]},
         grammar_notes=grammar_raw["notes"],
+        alphabet=alphabet_raw,
     )

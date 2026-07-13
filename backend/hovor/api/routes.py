@@ -361,6 +361,17 @@ def user_achievements(
     return {"achievements": game.achievements_for(db, user_id, content)}
 
 
+# -- alphabet primer (day-zero diacritics on-ramp, no scoring) ----------------
+
+@router.get("/alphabet")
+def get_alphabet(content: ContentBundle = Depends(get_content)):
+    """Day-zero Slovak alphabet + diacritics primer data.
+    Letters, examples, contrast pairs, typing tips. No learner model impact.
+    Audio via existing /tts?text= endpoint.
+    """
+    return content.alphabet
+
+
 # -- settings & privacy ----------------------------------------------------------
 
 @router.patch("/users/{user_id}/settings")

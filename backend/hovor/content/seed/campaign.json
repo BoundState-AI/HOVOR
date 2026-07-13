@@ -1,5 +1,5 @@
 {
-  "content_version": "ancestry-slice-0.2.0",
+  "content_version": "ancestry-slice-0.2.3",
   "campaign_id": "ancestry_journey",
   "title": "The Journey Home",
   "description": "Retrace the family line from the Bratislava railway station to the archives of Modra. The map is a game layer over the curriculum graph — geography never gates prerequisite learning (spec 4).",
@@ -24,8 +24,7 @@
       "id": "pezinok",
       "title": "Pezinok — food, shopping, directions",
       "order": 3,
-      "missions": [],
-      "status": "planned",
+      "missions": ["pezinok_square_stop"],
       "unlock": {"type": "missions_completed", "missions": ["svaty_jur_family"]},
       "focus_skills": ["food_drink", "places_town", "wants_requests"]
     },

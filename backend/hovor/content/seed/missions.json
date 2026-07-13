@@ -1,5 +1,5 @@
 {
-  "content_version": "ancestry-slice-0.2.0",
+  "content_version": "ancestry-slice-0.2.3",
   "review_status": "PENDING_NATIVE_REVIEW",
   "missions": [
     {
@@ -999,6 +999,359 @@
         "optional_objectives": [
           "greet_formally",
           "state_identity"
+        ]
+      }
+    },
+    {
+      "id": "pezinok_square_stop",
+      "title": "Pezinok: Bread and the Way Forward",
+      "region": "Pezinok",
+      "character": {
+        "name": "pani Szabová",
+        "role": "bakery owner on the main square",
+        "register": "neutral"
+      },
+      "briefing": "You've stopped in Pezinok on the family route. Buy some fresh rožky at the bakery on the square, then ask pani Szabová for directions to the bus stop toward Modra.",
+      "skill_nodes": [
+        "food_drink",
+        "places_town",
+        "wants_requests",
+        "travel_transactions",
+        "survival_phrases"
+      ],
+      "opening_line": {
+        "slovak": "Dobrý deň. Čo si dáte?",
+        "english": "Good day. What can I get for you?"
+      },
+      "objectives": [
+        {
+          "id": "greet_baker",
+          "hidden_goal": "Greet pani Szabová politely.",
+          "lexemes": [
+            "dobry_den",
+            "pani"
+          ],
+          "match": {
+            "any_phrases": [
+              "dobrý deň",
+              "dobry den",
+              "pani szabová",
+              "pani"
+            ]
+          },
+          "elicit": {
+            "slovak": "Nech sa páči?",
+            "english": "Yes, please? (she waits for your greeting)"
+          },
+          "ack": {
+            "slovak": "Dobrý deň.",
+            "english": "Good day."
+          },
+          "hints": [
+            {
+              "level": "repeat_slower",
+              "text": "Dobrý... deň."
+            },
+            {
+              "level": "semantic",
+              "text": "Greet the woman at the bakery first — polite and simple."
+            },
+            {
+              "level": "first_word",
+              "text": "Dobrý..."
+            },
+            {
+              "level": "show_text",
+              "text": "Dobrý deň, pani."
+            },
+            {
+              "level": "translate",
+              "text": "Say: 'Dobrý deň' — good day."
+            }
+          ]
+        },
+        {
+          "id": "order_rolls",
+          "hidden_goal": "Ask for rožky using a request structure.",
+          "lexemes": [
+            "prosim_si",
+            "rozok",
+            "chcem",
+            "kupit"
+          ],
+          "match": {
+            "all_groups": [
+              [
+                "prosím si",
+                "prosim si",
+                "chcem",
+                "chcel by som",
+                "kúpiť",
+                "kupit"
+              ],
+              [
+                "rožok",
+                "rozok",
+                "rožky",
+                "rozky"
+              ]
+            ]
+          },
+          "elicit": {
+            "slovak": "Máme čerstvé rožky. Čo si prosíte?",
+            "english": "We have fresh rolls. What would you like?"
+          },
+          "ack": {
+            "slovak": "Dva rožky? Áno.",
+            "english": "Two rolls? Yes."
+          },
+          "hints": [
+            {
+              "level": "repeat_slower",
+              "text": "Čo... si... prosíte?"
+            },
+            {
+              "level": "semantic",
+              "text": "Say you want the rolls: 'Prosím si rožky' or 'Chcem kúpiť rožky'."
+            },
+            {
+              "level": "first_word",
+              "text": "Prosím..."
+            },
+            {
+              "level": "show_text",
+              "text": "Prosím si dva rožky."
+            },
+            {
+              "level": "translate",
+              "text": "Say: 'Prosím si rožky' — I'd like some rolls."
+            }
+          ]
+        },
+        {
+          "id": "ask_price",
+          "hidden_goal": "Ask how much the rožky cost.",
+          "lexemes": [
+            "kolko_stoji"
+          ],
+          "match": {
+            "any_phrases": [
+              "koľko stojí",
+              "kolko stoji",
+              "koľko to stojí",
+              "koľko"
+            ]
+          },
+          "elicit": {
+            "slovak": "Tu máte rožky.",
+            "english": "Here are your rolls."
+          },
+          "ack": {
+            "slovak": "Dve eurá.",
+            "english": "Two euros."
+          },
+          "hints": [
+            {
+              "level": "repeat_slower",
+              "text": "Koľko... stojí?"
+            },
+            {
+              "level": "semantic",
+              "text": "Ask the price: 'Koľko to stojí?'"
+            },
+            {
+              "level": "first_word",
+              "text": "Koľko..."
+            },
+            {
+              "level": "show_text",
+              "text": "Koľko to stojí?"
+            },
+            {
+              "level": "translate",
+              "text": "Say: 'Koľko to stojí?' — how much does it cost?"
+            }
+          ]
+        },
+        {
+          "id": "ask_directions",
+          "hidden_goal": "Ask where the bus stop is and how to get to it toward Modra.",
+          "lexemes": [
+            "kde",
+            "zastavka",
+            "autobus",
+            "modra",
+            "rovno",
+            "dolava",
+            "dalej",
+            "idem",
+            "musim"
+          ],
+          "match": {
+            "all_groups": [
+              [
+                "kde",
+                "ako sa dostanem",
+                "kam"
+              ],
+              [
+                "zastávka",
+                "zastavka",
+                "autobusová zastávka"
+              ],
+              [
+                "modra",
+                "modry",
+                "do modry"
+              ]
+            ]
+          },
+          "elicit": {
+            "slovak": "A idete ďalej? Do Modry?",
+            "english": "And you're going on? To Modra?"
+          },
+          "ack": {
+            "slovak": "Autobusová zastávka je rovno, potom doľava.",
+            "english": "The bus stop is straight ahead, then left."
+          },
+          "hints": [
+            {
+              "level": "repeat_slower",
+              "text": "Kde... je... zastávka?"
+            },
+            {
+              "level": "semantic",
+              "text": "Ask where the stop is. Say you're going to Modra. Use rovno, doľava, ďalej."
+            },
+            {
+              "level": "first_word",
+              "text": "Kde..."
+            },
+            {
+              "level": "show_text",
+              "text": "Kde je zastávka? Idem do Modry."
+            },
+            {
+              "level": "translate",
+              "text": "Say: 'Kde je zastávka? Idem do Modry.' — where is the stop? I'm going to Modra."
+            }
+          ]
+        },
+        {
+          "id": "repair_direction",
+          "hidden_goal": "She misheard the direction or destination. Correct her.",
+          "lexemes": [
+            "nie",
+            "modra",
+            "zastavka",
+            "rovno",
+            "dolava"
+          ],
+          "match": {
+            "all_groups": [
+              [
+                "nie"
+              ],
+              [
+                "modra",
+                "modry",
+                "do modry"
+              ]
+            ]
+          },
+          "elicit": {
+            "slovak": "Takže idete späť do Bratislavy?",
+            "english": "So you're going back to Bratislava?"
+          },
+          "ack": {
+            "slovak": "Prepáčte — idete do Modry. Zastávka je rovno a potom doľava.",
+            "english": "Sorry — you're going to Modra. The stop is straight ahead and then left."
+          },
+          "hints": [
+            {
+              "level": "repeat_slower",
+              "text": "Späť... do Bratislavy?"
+            },
+            {
+              "level": "semantic",
+              "text": "No, you're going to Modra. Correct the direction to the stop."
+            },
+            {
+              "level": "first_word",
+              "text": "Nie..."
+            },
+            {
+              "level": "show_text",
+              "text": "Nie, do Modry. Kde je zastávka?"
+            },
+            {
+              "level": "translate",
+              "text": "Say: 'Nie, idem do Modry.' — no, I'm going to Modra."
+            }
+          ]
+        },
+        {
+          "id": "thank_close",
+          "hidden_goal": "Thank her politely and say goodbye.",
+          "lexemes": [
+            "dakujem_pekne",
+            "dovidenia"
+          ],
+          "match": {
+            "any_phrases": [
+              "ďakujem pekne",
+              "dakujem pekne",
+              "ďakujem",
+              "dovidenia",
+              "do videnia"
+            ]
+          },
+          "elicit": {
+            "slovak": "Tu sú rožky. Šťastnú cestu!",
+            "english": "Here are the rolls. Safe travels!"
+          },
+          "ack": {
+            "slovak": "Prosím. Dovidenia!",
+            "english": "You're welcome. Goodbye!"
+          },
+          "hints": [
+            {
+              "level": "repeat_slower",
+              "text": "Ďakujem... pekne."
+            },
+            {
+              "level": "semantic",
+              "text": "Thank her for the bread and the directions."
+            },
+            {
+              "level": "first_word",
+              "text": "Ďakujem..."
+            },
+            {
+              "level": "show_text",
+              "text": "Ďakujem pekne. Dovidenia."
+            },
+            {
+              "level": "translate",
+              "text": "Say: 'Ďakujem pekne, dovidenia.'"
+            }
+          ]
+        }
+      ],
+      "completion_line": {
+        "slovak": "Rovno a potom doľava na autobusovú zastávku. Do Modry!",
+        "english": "Straight and then left to the bus stop. To Modra!"
+      },
+      "win_conditions": {
+        "required_objectives": [
+          "order_rolls",
+          "ask_price",
+          "ask_directions",
+          "repair_direction"
+        ],
+        "optional_objectives": [
+          "greet_baker",
+          "thank_close"
         ]
       }
     }

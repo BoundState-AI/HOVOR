@@ -58,6 +58,20 @@ def speakable_strings(content) -> set[str]:
     for item in content.repair_items.values():
         out.add(item["broken"])
         out.update(item["fixed"])
+    # Day-0 alphabet primer (spec §18 hear-it applies to every content string):
+    # letters, example words, contrast words, and typing-practice words.
+    alphabet = content.alphabet or {}
+    for letter in alphabet.get("letters", []):
+        if letter.get("char"):
+            out.add(letter["char"])
+        for example in letter.get("examples", []):
+            if example.get("slovak"):
+                out.add(example["slovak"])
+    for pair in alphabet.get("contrast_pairs", []):
+        for key in ("a", "b", "word_a", "word_b"):
+            if pair.get(key):
+                out.add(pair[key])
+    out.update(alphabet.get("practice_words", []))
 
     _speakable_cache[content.content_version] = out
     return out

@@ -6,7 +6,7 @@ Modra archive mission, and gets an honest debrief."""
 def test_health_reports_content_version(client):
     body = client.get("/health").json()
     assert body["status"] == "ok"
-    assert body["content_version"] == "ancestry-slice-0.2.0"
+    assert body["content_version"] == "ancestry-slice-0.2.3"
     assert body["content_review_status"] == "PENDING_NATIVE_REVIEW"
 
 

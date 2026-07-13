@@ -1,5 +1,5 @@
 {
-  "content_version": "ancestry-slice-0.2.0",
+  "content_version": "ancestry-slice-0.2.3",
   "nodes": [
     {"id": "greetings_basic", "kind": "communicative_function", "title": "Basic greetings", "stage": 0},
     {"id": "survival_phrases", "kind": "communicative_function", "title": "Survival phrases (repeat, slower, don't understand)", "stage": 0},
@@ -42,6 +42,10 @@
     {"pair": ["dobry_den", "dobry_vecer"], "note": "time-of-day greetings"},
     {"pair": ["rozumiem", "nerozumiem"], "note": "negation prefix easily missed in listening"},
     {"pair": ["spiatocny", "jednosmerny"], "note": "return vs one-way — high-stakes at ticket counters"},
-    {"pair": ["pivo", "vino"], "note": "beer vs wine — semantically adjacent orders"}
+    {"pair": ["pivo", "vino"], "note": "beer vs wine — semantically adjacent orders"},
+    {"pair": ["zastavka", "stanica"], "note": "bus stop vs train station — critical when asking directions in town"},
+    {"pair": ["mozem", "musim"], "note": "can vs must — common modal mix-up for requests"},
+    {"pair": ["dolava", "doprava"], "note": "left vs right — high-stakes for directions"},
+    {"pair": ["pekaren", "obchod"], "note": "bakery vs general shop — Pezinok food shopping distinction"}
   ]
 }

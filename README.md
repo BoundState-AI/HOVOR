@@ -66,6 +66,9 @@ uv run python -m hovor.bakeoff hovor/bakeoff/sample_manifest.json --providers mo
 5. **Pronunciation engine** (Build 5, §10) — intentionally absent until an
    opt-in **learner** speech corpus exists (collected via the tested consent
    flows, §31). Not blocked on native speakers; unblocks with real usage.
+6. **Alphabet / diacritics primer** — day-zero on-ramp for the 46 letters and
+   marks is now live in the web client (always accessible from home, uses
+   existing TTS, contrast drills + typing practice, no scoring).
 
 ## Layout
 
